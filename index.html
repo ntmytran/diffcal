@@ -36,6 +36,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15p
 .wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
 h1{font-size:1.2rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
 h1 span{color:var(--accent)}
+h1 .pre{color:inherit}
+@media (max-width:440px){h1 .pre{display:none}h1{font-size:1.05rem;white-space:nowrap}}
 h2{font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0;font-weight:600}
 .hint{font-size:.78rem;color:var(--muted)}
 input,select,textarea{font:inherit;font-family:var(--f-num);font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%;min-width:0}
@@ -94,8 +96,13 @@ button.danger{color:var(--warn);border-color:var(--warn)}
 .item .inl input{width:84px;padding:6px 8px}
 .item .inl span{font-size:.8rem;color:var(--muted)}
 .pill{display:inline-block;font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--warn-soft);color:var(--warn);margin-left:6px;vertical-align:2px;text-decoration:none}
-.nodox{margin:10px 0 0;font-size:.85rem;color:var(--muted)}
-.nodox b{color:var(--warn)}
+.musts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.must{flex:1 1 140px;display:flex;align-items:center;gap:8px;background:var(--warn-soft);color:var(--warn);border:1.5px solid var(--warn);border-radius:10px;padding:8px 12px;font-weight:700;font-size:.92rem}
+.must svg{flex:none}
+.item.mustitem{background:var(--warn-soft)}
+.item.mustitem .nm{color:var(--warn);font-weight:700}
+.dmso{margin:10px 0 0;font-size:.8rem;color:var(--muted)}
+.pdfbtn{display:inline-flex;align-items:center;gap:6px}
 
 /* extras */
 .extras{display:flex;flex-direction:column;gap:10px}
@@ -147,6 +154,7 @@ button.danger{color:var(--warn);border-color:var(--warn)}
 .card tr.cg td{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:#555;font-weight:600;border-bottom:0.2mm solid #111;padding-top:1.4mm}
 .card .foot{display:grid;grid-template-columns:1fr 1fr;gap:1mm 3mm;margin-top:1.5mm}
 .card .foot div{display:flex;gap:1.2mm;align-items:center}
+.card .foot .hl{font-weight:700;border:0.35mm solid #111;padding:0.8mm 1.2mm}
 .card .foot i{display:inline-block;width:2.6mm;height:2.6mm;border:0.25mm solid #111;flex:none}
 @page{size:A4 portrait;margin:12mm}
 @media print{
@@ -163,7 +171,7 @@ button.danger{color:var(--warn);border-color:var(--warn)}
 <div class="wrap">
   <div class="bar">
     <div class="bar-in">
-      <div class="title"><h1>imMKCL <span>diff. medium</span> · HS</h1><div class="status"><span id="toast" class="toast" role="status"></span><span id="prog" class="progress">0 / 0</span><button id="resetBtn" class="ghost" type="button">Clear</button></div></div>
+      <div class="title"><h1><span class="pre">imMKCL </span><span>diff. medium</span> · HS</h1><div class="status"><span id="toast" class="toast" role="status"></span><span id="prog" class="progress">0 / 0</span><button id="resetBtn" class="ghost" type="button">Clear</button><button id="barPdf" class="primary pdfbtn" type="button">PDF</button></div></div>
       <div class="vbox"><label for="vol">Final</label><input id="vol" type="number" inputmode="decimal" min="0" step="0.5" value="10"><span class="u">ml</span></div>
       <div class="vbox"><label for="extra">+ extra</label><input id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="0"><span class="u">ml</span></div>
     </div>
@@ -172,9 +180,10 @@ button.danger{color:var(--warn);border-color:var(--warn)}
   <div class="grid">
     <!-- Checklist -->
     <section class="list-area">
-      <div class="head"><h2>Checklist · make <span id="sTotal">–</span></h2><div style="display:flex;gap:4px"><button id="copyBtn" class="ghost" type="button">Copy</button><button id="printBtn" type="button">Print table</button></div></div>
+      <div class="musts"><div class="must"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20L12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5M12 18v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>No doxycycline</div><div class="must"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20L12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v5M12 18v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Filter 0.22 µm before use</div></div>
+      <div class="head"><h2>Checklist · make <span id="sTotal">–</span></h2><div style="display:flex;gap:4px"><button id="copyBtn" class="ghost" type="button">Copy</button><button id="printBtn" type="button">Print / PDF</button></div></div>
       <div id="list" class="list"></div>
-      <p class="nodox"><b>No doxycycline</b> in differentiation medium. DMSO in final medium: <span id="sDmso">–</span>.</p>
+      <p class="dmso">DMSO in final medium: <span id="sDmso">–</span>.</p>
     </section>
 
     <!-- Settings -->
@@ -229,13 +238,14 @@ button.danger{color:var(--warn);border-color:var(--warn)}
 
 <div id="pv" hidden>
   <div class="pv-controls">
-    <div class="btns"><button id="pvPrint" class="primary" type="button">Print</button><button id="pvClose" type="button">Close</button></div>
-    <p>Prints on A4 at the top-left. Print at 100% scale (not “fit to page”), then cut along the dashed line. Card ≤ 88 × 175 mm (½ × 0.7 of B5).</p>
+    <div class="btns"><button id="pvPdf" class="primary" type="button">Save PDF</button><button id="pvPrint" type="button">Print</button><button id="pvClose" type="button">Close</button></div>
+    <p>The PDF is an A4 page with the card at the top-left, 86 mm wide and at most 175 mm tall. Print at 100% scale (“actual size”, not “fit to page”) and cut along the dashed line.</p>
   </div>
   <div id="card" class="card"></div>
 </div>
 <textarea id="copyFallback" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px;top:0;width:1px;height:1px"></textarea>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function(){
 const $ = id => document.getElementById(id);
@@ -349,9 +359,7 @@ function compute(){
   }
 
   grp("Finish");
-  step("mix","Mix gently");
-  step("filter","Filter through 0.22 µm");
-  step("wash","Wash cells 2× with 10 ml PBS (remove doxycycline), resuspend in this medium");
+  R.push({key:"filter",name:"Filter through 0.22 µm",step:true,must:true});
 
   const base=V-added;
   R.splice(baseIdx,0,{key:"base",name:"Base medium",meta:"IMDM + ITS, P/S, MTG, L-AA",ml:base,base:true,warn:base<0,note:base<0?"Additions exceed the final volume.":""});
@@ -369,7 +377,7 @@ function renderList(){
     box.innerHTML=c.R.map(r=>{
       if(r.group) return `<div class="grp">${esc(r.group)}</div>`;
       const id="chk-"+r.key.replace(/[^\w-]/g,"_");
-      const cls="item"+(r.step?" step":"")+(r.base?" base":"");
+      const cls="item"+(r.step?" step":"")+(r.base?" base":"")+(r.must?" mustitem":"");
       const inl = r.asa ? `<div class="inl" data-noclick>
           <input id="asaW" type="number" inputmode="decimal" min="0" step="0.0001" value="${esc(S.asaW)}" aria-label="Aspirin weight in grams"><span>g to</span>
           <input id="asaS" type="number" inputmode="decimal" min="0" step="10" value="${esc(S.asaS)}" aria-label="Aspirin stock in mM"><span>mM stock</span></div>` : "";
@@ -486,7 +494,7 @@ function renderLog(){
         <table>${e.rows.map(r=>`<tr><td>${esc(r.name)}<div class="hint">${esc(r.meta||"")}</div></td><td>${esc(r.vol)}</td></tr>`).join("")}
         <tr><td><b>Total</b>${e.extra>0?`<div class="hint">${fmtVol(e.final)} + ${fmtVol(e.extra)} extra</div>`:""}</td><td><b>${fmtVol(e.total)}</b></td></tr></table>
         <div class="hint" style="margin-top:6px">Aspirin: ${esc(e.asaW)} g in ${esc(e.asaV)} DMSO (${esc(e.asaMM)} mM)</div>
-        <div class="acts"><button type="button" data-copy="${i}">Copy entry</button><button type="button" data-print="${i}">Print</button><button type="button" class="ghost" data-del="${i}">Delete</button></div>
+        <div class="acts"><button type="button" data-copy="${i}">Copy entry</button><button type="button" data-print="${i}">Print / PDF</button><button type="button" class="ghost" data-del="${i}">Delete</button></div>
       </div>
     </details>`).join("");
 }
@@ -530,6 +538,7 @@ $("csvBtn").addEventListener("click",()=>{
 /* ---------- print card ---------- */
 const MMPX=96/25.4;
 function openPrint(e){
+  pvEntry=e;
   const byGroup=[]; let g=null;
   const groupOf=n=>/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
   e.rows.forEach(r=>{ const gg=groupOf(r.name); if(gg!==g){ g=gg; byGroup.push({group:gg}); } byGroup.push(r); });
@@ -544,7 +553,7 @@ function openPrint(e){
     <table>${byGroup.map(r=> r.group ? `<tr class="cg"><td colspan="3">${esc(r.group)}</td></tr>` :
       `<tr><td class="bx"><i></i></td><td>${esc(r.name)}<div class="sm">${esc(r.meta||"")}</div></td><td class="v">${esc(r.vol)}</td></tr>`).join("")}</table>
     <div class="foot">
-      <div><i></i>No doxycycline</div><div><i></i>Filtered 0.22 µm</div>
+      <div class="hl"><i></i>No doxycycline</div><div class="hl"><i></i>Filtered 0.22 µm</div>
       <div>HS lot <span class="line" style="flex:1"></span></div><div>Initials <span class="line" style="flex:1"></span></div>
     </div>`;
   $("pv").hidden=false;
@@ -555,6 +564,78 @@ function openPrint(e){
 $("printBtn").addEventListener("click",()=>openPrint(Object.assign(makeEntry(),{note:$("logNote").value.trim()})));
 $("pvClose").addEventListener("click",()=>{ $("pv").hidden=true; });
 $("pvPrint").addEventListener("click",()=>{ try{ window.print(); }catch(e){} });
+
+
+/* ---------- PDF export (vector, exact size on A4) ---------- */
+let pvEntry=null;
+function groupRows(rows){
+  const out=[]; let g=null;
+  const groupOf=n=>/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
+  rows.forEach(r=>{ const gg=groupOf(r.name); if(gg!==g){ g=gg; out.push({group:gg}); } out.push(r); });
+  return out;
+}
+const pdfTxt=t=>String(t??"").replace(/\u03BC/g,"\u00B5").replace(/→/g,"->").replace(/×/g,"x").replace(/−/g,"-").replace(/[“”]/g,'"').replace(/[^\x00-\xFF]/g,"?");
+function drawCard(doc,e,k,draw){
+  // k = font scale; returns height in mm. Units: mm. Card at (X0,Y0), width W.
+  const X0=12, Y0=12, W=86, P=3.5, L=X0+P, Rt=X0+W-P;
+  let y=Y0+P;
+  const pt=v=>v*k, lh=v=>v*k*0.3528*1.25; // pt -> mm line height
+  const T=(s,x,yy,o={})=>{ if(draw){ doc.setFont(o.font||"helvetica",o.style||"normal"); doc.setFontSize(pt(o.size||7.5)); doc.setTextColor(o.color||0); doc.text(pdfTxt(s),x,yy,{align:o.align||"left",baseline:"top"}); } };
+  const line=(x1,y1,x2,y2,w=0.2,c=0)=>{ if(draw){ doc.setDrawColor(c); doc.setLineWidth(w); doc.line(x1,y1,x2,y2); } };
+  const box=(x,yy,sz,w=0.25)=>{ if(draw){ doc.setDrawColor(0); doc.setLineWidth(w); doc.rect(x,yy,sz,sz); } };
+  // header
+  T("imMKCL diff. medium · HS",L,y,{style:"bold",size:9.5});
+  T(fmtDate(e.ts).split(" ")[0],Rt,y+0.4,{font:"courier",size:7.5,align:"right"});
+  y+=lh(9.5)+0.8; line(L,y,Rt,y,0.35); y+=1.2;
+  const info=[["Volume",fmtVol(e.total)+(e.extra>0?` (${fmtVol(e.final)} + ${fmtVol(e.extra)} extra)`:"")],
+              ["Aspirin",`${e.asaW} g in ${e.asaV} DMSO = ${e.asaMM} mM`],["Note",e.note||""]];
+  info.forEach(([a,b])=>{
+    T(a,L,y,{size:7,color:90});
+    if(a==="Note"&&!b){ line(L+13,y+lh(7)-0.3,Rt,y+lh(7)-0.3,0.2,150); }
+    else if(draw){ doc.setFont(a==="Note"?"helvetica":"courier",a==="Volume"?"bold":"normal"); doc.setFontSize(pt(7)); doc.setTextColor(0);
+      const lines=doc.splitTextToSize(pdfTxt(b),Rt-L-13); doc.text(lines,L+13,y,{baseline:"top"}); y+=lh(7)*(lines.length-1); }
+    else { doc.setFont("helvetica","normal"); doc.setFontSize(pt(7)); y+=lh(7)*(doc.splitTextToSize(pdfTxt(b),Rt-L-13).length-1); }
+    y+=lh(7)+0.4;
+  });
+  y+=0.8;
+  groupRows(e.rows).forEach(r=>{
+    if(r.group){ y+=0.8; T(r.group.toUpperCase(),L,y,{style:"bold",size:6,color:90}); y+=lh(6)+0.3; line(L,y,Rt,y,0.3); y+=0.9; return; }
+    const bs=pt(7.5)*0.3528*0.95;
+    box(L,y+0.25,bs);
+    T(r.name,L+bs+2,y,{size:7.5});
+    T(r.vol,Rt,y,{font:"courier",style:"bold",size:8,align:"right"});
+    y+=lh(7.5);
+    if(r.meta){ T(r.meta,L+bs+2,y,{font:"courier",size:6,color:90}); y+=lh(6); }
+    y+=0.5; line(L,y,Rt,y,0.15,190); y+=0.9;
+  });
+  // must-do boxes
+  y+=0.8;
+  const half=(Rt-L-2)/2, bh=lh(8)+2;
+  [["NO DOXYCYCLINE",L],["FILTERED 0.22 µm",L+half+2]].forEach(([t,x])=>{
+    if(draw){ doc.setDrawColor(0); doc.setLineWidth(0.4); doc.rect(x,y,half,bh); }
+    const bs=pt(8)*0.3528*0.95; box(x+1.5,y+(bh-bs)/2,bs);
+    T(t,x+1.5+bs+1.8,y+(bh-lh(8))/2+0.3,{style:"bold",size:8});
+  });
+  y+=bh+2.2;
+  T("HS lot",L,y,{size:7,color:90}); line(L+10,y+lh(7)-0.3,L+half,y+lh(7)-0.3,0.2,150);
+  T("Initials",L+half+2,y,{size:7,color:90}); line(L+half+14,y+lh(7)-0.3,Rt,y+lh(7)-0.3,0.2,150);
+  y+=lh(7)+P;
+  const H=y-Y0;
+  if(draw){ doc.setDrawColor(110); doc.setLineWidth(0.25); doc.setLineDashPattern([1.5,1.2],0); doc.rect(X0,Y0,W,H); doc.setLineDashPattern([],0);
+    doc.setFontSize(5.5); doc.setTextColor(140); doc.setFont("helvetica","normal"); doc.text("cut along dashed line · print at 100% (actual size)",X0,Y0+H+2.5,{baseline:"top"}); }
+  return H;
+}
+function makePdf(e){
+  const J=window.jspdf&&window.jspdf.jsPDF;
+  if(!J){ toast("PDF library didn’t load. Check the connection."); return; }
+  const doc=new J({unit:"mm",format:"a4",orientation:"portrait"});
+  let k=1; while(drawCard(doc,e,k,false)>175 && k>0.7) k-=0.03;
+  drawCard(doc,e,k,true);
+  const name=`diff-medium_${fmtDate(e.ts).split(" ")[0]}_${String(e.total).replace(".","-")}ml.pdf`;
+  try{ doc.save(name); toast("PDF saved"); }catch(err){ toast("Download blocked here. Use the GitHub site."); }
+}
+$("pvPdf").addEventListener("click",()=>{ if(pvEntry) makePdf(pvEntry); });
+$("barPdf").addEventListener("click",()=>makePdf(Object.assign(makeEntry(),{note:$("logNote").value.trim()})));
 
 /* ---------- top inputs ---------- */
 FIELDS.forEach(id=>{ const h=()=>{ S[id]=$(id).value; save(); renderList(); }; $(id).addEventListener("input",h); $(id).addEventListener("change",h); });
