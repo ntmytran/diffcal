@@ -12,207 +12,197 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<style>:root{padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
 <title>imMKCL Differentiation Medium</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-/* Layout: bench-sheet — inputs on the left, the pipetting table as the main surface on the right; stacks on phones */
+/* Layout: bench checklist — sticky volume bar on top; checklist + notebook log as the main column, settings in a side column (below the checklist on phones) */
 :root{
   --bg:#f5f6f8; --panel:#ffffff; --ink:#1b2130; --muted:#5d6678; --line:#dde1e8;
-  --accent:#9b2c5e; --accent-soft:#f6e6ee; --warn:#9a5b00; --warn-soft:#fdf1dc; --ok:#23704a;
+  --accent:#9b2c5e; --accent-soft:#f6e6ee; --warn:#9a5b00; --warn-soft:#fdf1dc; --ok:#23704a; --ok-soft:#e3f3ea;
   --f-ui:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12151c; --panel:#1a1f29; --ink:#e7eaf0; --muted:#98a1b3; --line:#2c3341;
-  --accent:#e57aa8; --accent-soft:#3a2130; --warn:#f0b24d; --warn-soft:#3a2d15; --ok:#6fd0a0; color-scheme:dark}}
+  --accent:#e57aa8; --accent-soft:#3a2130; --warn:#f0b24d; --warn-soft:#3a2d15; --ok:#6fd0a0; --ok-soft:#18342a; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#12151c; --panel:#1a1f29; --ink:#e7eaf0; --muted:#98a1b3; --line:#2c3341;
-  --accent:#e57aa8; --accent-soft:#3a2130; --warn:#f0b24d; --warn-soft:#3a2d15; --ok:#6fd0a0; color-scheme:dark}
+  --accent:#e57aa8; --accent-soft:#3a2130; --warn:#f0b24d; --warn-soft:#3a2d15; --ok:#6fd0a0; --ok-soft:#18342a; color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.45}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:20px}
-h1{font-size:1.55rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.45;-webkit-text-size-adjust:100%}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+h1{font-size:1.2rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
 h1 span{color:var(--accent)}
-.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
-h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:600}
-.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
-@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
-.stack{display:flex;flex-direction:column;gap:16px}
-.field{display:flex;flex-direction:column;gap:4px}
-.field label{font-size:.85rem;font-weight:600}
+h2{font-size:.76rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0;font-weight:600}
 .hint{font-size:.78rem;color:var(--muted)}
+input,select,textarea{font:inherit;font-family:var(--f-num);font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%;min-width:0}
+textarea{font-family:var(--f-ui);resize:vertical}
+input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button{font:inherit;font-size:.86rem;font-weight:600;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);-webkit-tap-highlight-color:transparent}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+button.ghost{border-color:transparent;background:transparent;color:var(--muted);padding:6px 8px}
+button.ghost:hover{color:var(--accent)}
+button.danger{color:var(--warn);border-color:var(--warn)}
+
+/* sticky volume bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin-inline:-16px;padding:10px 16px}
+.bar-in{max-width:1120px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.bar .title{flex:1 1 100%;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vbox{display:flex;align-items:center;gap:6px}
+.vbox label{font-size:.78rem;font-weight:600;color:var(--muted)}
+.vbox input{width:88px}
+#vol{font-size:1.25rem;font-weight:600;width:100px;padding:6px 8px}
+.vbox .u{font-family:var(--f-num);color:var(--muted);font-size:.85rem}
+.status{display:flex;align-items:center;gap:6px;font-size:.85rem}
+.progress{font-family:var(--f-num);font-variant-numeric:tabular-nums;background:var(--accent-soft);color:var(--accent);border-radius:99px;padding:3px 10px;font-weight:600;white-space:nowrap}
+.progress.done{background:var(--ok-soft);color:var(--ok)}
+
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,330px);grid-template-areas:"list aside" "log aside";grid-template-rows:auto 1fr;gap:20px;align-items:start;margin-top:18px}
+.list-area{grid-area:list;min-width:0}.aside{grid-area:aside;min-width:0}.log-area{grid-area:log;min-width:0}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"list" "aside" "log";grid-template-rows:auto}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label,.flabel{font-size:.85rem;font-weight:600}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input,select{font:inherit;font-family:var(--f-num);font-size:.92rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%;min-width:0}
-input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-input.big{font-size:1.35rem;padding:8px 10px}
 .unitbox{display:flex;align-items:center;gap:6px}
 .unitbox span{font-family:var(--f-num);color:var(--muted);font-size:.85rem;white-space:nowrap}
-.divider{border:0;border-top:1px solid var(--line);margin:4px 0}
-button{font:inherit;font-size:.86rem;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
-button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
-button.ghost{border-color:transparent;background:transparent;color:var(--muted);padding:4px 8px}
-button.ghost:hover{color:var(--accent)}
-.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
-table{border-collapse:collapse;width:100%;min-width:620px}
-th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;background:var(--bg)}
-td.num,th.num{text-align:right}
-td .n{font-family:var(--f-num);font-variant-numeric:tabular-nums}
-td.vol{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:500;font-size:1.02rem;text-align:right;white-space:nowrap}
-tr.group td{background:var(--bg);font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:6px 12px}
-tr.total td{border-bottom:0;font-weight:700}
-.note{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
-.pill{display:inline-block;font-size:.7rem;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:1px}
-.pill.warn{background:var(--warn-soft);color:var(--warn)}
-.sum{display:flex;flex-wrap:wrap;gap:8px 24px;margin:0 0 12px;font-size:.9rem}
-.sum b{font-family:var(--f-num);font-weight:500}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+
+/* checklist */
+.list{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.grp{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;padding:8px 14px;background:var(--bg);border-top:1px solid var(--line)}
+.grp:first-child{border-top:0}
+.item{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:4px 10px;align-items:start;padding:12px 14px;border-top:1px solid var(--line);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.grp+.item{border-top:0}
+.item input.chk{width:24px;height:24px;margin:1px 0 0;accent-color:var(--accent);cursor:pointer}
+.item .nm{font-weight:600;font-size:1rem;line-height:1.3}
+.item .meta{font-family:var(--f-num);font-size:.78rem;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+.item .note{font-size:.78rem;color:var(--muted);margin-top:2px}
+.item .vol{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:600;font-size:1.35rem;text-align:right;white-space:nowrap;line-height:1.2;color:var(--ink)}
+.item.step .nm{font-weight:500}
+.item.base .vol{color:var(--accent)}
+.item.checked{background:var(--bg)}
+.item.checked .nm,.item.checked .meta,.item.checked .note{opacity:.5}
+.item.checked .nm{text-decoration:line-through}
+.item.checked .vol{opacity:.4;text-decoration:line-through}
+.item .inl{grid-column:1 / 4;padding-left:40px;display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:6px;cursor:default}
+.item .inl input{width:84px;padding:6px 8px}
+.item .inl span{font-size:.8rem;color:var(--muted)}
+.pill{display:inline-block;font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--warn-soft);color:var(--warn);margin-left:6px;vertical-align:2px;text-decoration:none}
+.nodox{margin:10px 0 0;font-size:.85rem;color:var(--muted)}
+.nodox b{color:var(--warn)}
+
+/* extras */
 .extras{display:flex;flex-direction:column;gap:10px}
-.extra{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;grid-template-columns:1fr;gap:8px;background:var(--bg)}
+.extra{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;gap:8px;background:var(--bg)}
 .extra .top{display:flex;gap:8px;align-items:center}
 .extra .top input[type=text]{flex:1}
-.extra .pair{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:6px}
+.extra .top input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
+.extra .pair{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:6px}
 .extra .lbl{font-size:.74rem;color:var(--muted);font-weight:600}
-.checks{margin:14px 0 0;padding:12px 14px 12px 32px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.88rem;color:var(--muted)}
-.checks li+li{margin-top:4px}
-.checks strong{color:var(--ink)}
-.toast{font-size:.8rem;color:var(--ok);min-height:1em}
-.err{color:var(--warn);font-size:.78rem}
+.tag{font-size:.68rem;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--accent-soft);color:var(--accent)}
+
+/* log */
+.log-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.entry{border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.entry summary{list-style:none;cursor:pointer;padding:10px 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px}
+.entry summary::-webkit-details-marker{display:none}
+.entry .when{font-family:var(--f-num);font-size:.8rem;color:var(--muted)}
+.entry .tot{font-family:var(--f-num);font-weight:600;text-align:right}
+.entry .en{grid-column:1 / 3;font-size:.9rem;overflow-wrap:anywhere}
+.entry .body{padding:0 12px 12px}
+.entry table{width:100%;border-collapse:collapse;font-size:.82rem}
+.entry td{padding:4px 0;border-top:1px solid var(--line);vertical-align:top}
+.entry td:last-child{text-align:right;font-family:var(--f-num);white-space:nowrap;padding-left:10px}
+.entry .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.empty{font-size:.85rem;color:var(--muted);padding:8px 0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10;font-size:.85rem;font-weight:600;color:var(--panel);background:var(--ok);padding:8px 14px;border-radius:99px;white-space:nowrap}
+.toast:empty{display:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div>
-      <h1>imMKCL <span>differentiation medium</span> with human serum</h1>
-      <p class="sub">Enter the final volume you need. Every volume below scales to it. Your base medium (500 ml IMDM already supplemented with ITS, Pen/Strep, MTG and L-ascorbic acid) fills the rest. Concentrations follow the protocol (page 1).</p>
+  <div class="bar">
+    <div class="bar-in">
+      <div class="title"><h1>imMKCL <span>diff. medium</span> · HS</h1><div class="status"><span id="toast" class="toast" role="status"></span><span id="prog" class="progress">0 / 0</span><button id="resetBtn" class="ghost" type="button">Clear</button></div></div>
+      <div class="vbox"><label for="vol">Final</label><input id="vol" type="number" inputmode="decimal" min="0" step="0.5" value="10"><span class="u">ml</span></div>
+      <div class="vbox"><label for="extra">+ extra</label><input id="extra" type="number" inputmode="decimal" min="0" step="0.5" value="0"><span class="u">ml</span></div>
     </div>
-  </header>
+  </div>
 
   <div class="grid">
-    <!-- Inputs -->
-    <div class="stack">
-      <section class="panel stack">
-        <h2>Volume</h2>
-        <div class="field">
-          <label for="vol">Final volume of medium</label>
-          <div class="unitbox"><input id="vol" class="big" type="number" min="0" step="0.5" value="10"><span>ml</span></div>
-        </div>
-        <div class="field">
-          <label for="extra">Extra volume</label>
-          <div class="unitbox"><input id="extra" type="number" min="0" step="0.5" value="0"><span>ml</span></div>
-          <span class="hint">The protocol suggests making ≈2 ml extra (lost in the 0.22 µm filter). Leave at 0 if already included above.</span>
-        </div>
-      </section>
+    <!-- Checklist -->
+    <section class="list-area">
+      <div class="head"><h2>Checklist · make <span id="sTotal">–</span></h2><button id="copyBtn" class="ghost" type="button">Copy table</button></div>
+      <div id="list" class="list"></div>
+      <p class="nodox"><b>No doxycycline</b> in differentiation medium. DMSO in final medium: <span id="sDmso">–</span>.</p>
+    </section>
 
-      <section class="panel stack">
-        <h2>Aspirin (fresh in DMSO)</h2>
-        <div class="row2">
-          <div class="field">
-            <label for="asaW">Weight</label>
-            <div class="unitbox"><input id="asaW" type="number" min="0" step="0.0001" value="0.0180"><span>g</span></div>
-          </div>
-          <div class="field">
-            <label for="asaV">in DMSO</label>
-            <div class="unitbox"><input id="asaV" type="number" min="0" step="0.1" value="1"><span>ml</span></div>
-          </div>
-        </div>
-        <div class="field">
-          <span style="font-size:.85rem;font-weight:600">Final concentration</span>
-          <div class="n" style="font-family:var(--f-num);font-size:1.05rem">200 µM <span class="hint">(fixed)</span></div>
-          <span class="hint">Acetylsalicylic acid, MW 180.158 g/mol. Stock: <b id="asaStock" class="n">–</b></span>
-        </div>
-      </section>
-
+    <!-- Settings -->
+    <aside class="aside stack">
       <section class="panel stack">
         <h2>Clexane (enoxaparin)</h2>
         <div class="row2">
-          <div class="field">
-            <label for="clxMg">Stock</label>
-            <div class="unitbox"><input id="clxMg" type="number" min="0" step="1" value="80"><span>mg /</span></div>
-          </div>
-          <div class="field">
-            <label for="clxMl">&nbsp;</label>
-            <div class="unitbox"><input id="clxMl" type="number" min="0" step="0.1" value="0.8"><span>ml</span></div>
-          </div>
+          <div class="field"><label for="clxMg">Stock</label>
+            <div class="unitbox"><input id="clxMg" type="number" inputmode="decimal" min="0" step="1" value="80"><span>mg /</span></div></div>
+          <div class="field"><label for="clxMl">&nbsp;</label>
+            <div class="unitbox"><input id="clxMl" type="number" inputmode="decimal" min="0" step="0.1" value="0.8"><span>ml</span></div></div>
         </div>
         <div class="row2">
-          <div class="field">
-            <label for="clxIU">Activity</label>
-            <div class="unitbox"><input id="clxIU" type="number" min="0" step="1" value="100"><span>IU/mg</span></div>
-          </div>
-          <div class="field">
-            <label for="clxF">Final</label>
-            <div class="unitbox"><input id="clxF" type="number" min="0" step="0.1" value="1"><span>U/ml</span></div>
-          </div>
+          <div class="field"><label for="clxIU">Activity</label>
+            <div class="unitbox"><input id="clxIU" type="number" inputmode="decimal" min="0" step="1" value="100"><span>IU/mg</span></div></div>
+          <div class="field"><label for="clxF">Final</label>
+            <div class="unitbox"><input id="clxF" type="number" inputmode="decimal" min="0" step="0.1" value="1"><span>U/ml</span></div></div>
         </div>
-        <span class="hint">Enoxaparin is labelled 100 IU anti-Xa per mg, so 80 mg/0.8 ml = 10,000 U/ml. Change the activity if your vial differs.</span>
-        <div class="field">
-          <label for="clxPre">Pre-dilute stock before adding</label>
+        <div class="field"><label for="clxPre">Pre-dilute stock</label>
           <select id="clxPre">
             <option value="auto">Automatically when under 2 µl</option>
             <option value="1">No, add undiluted stock</option>
             <option value="10">1/10</option>
             <option value="100">1/100</option>
-          </select>
-        </div>
+          </select></div>
+        <span class="hint">Enoxaparin: 100 IU anti-Xa per mg, so 80 mg/0.8 ml = 10,000 U/ml.</span>
       </section>
 
       <section class="panel stack">
-        <div class="toolbar" style="margin:0">
-          <h2 style="margin:0">Additional components</h2>
-          <button id="addBtn" type="button">+ Add</button>
-        </div>
-        <span class="hint">Give stock and final working concentration. Mixing molar and mass units needs a MW. Untick a row to leave it out.</span>
+        <div class="head" style="margin:0"><h2>Additional components</h2><button id="addBtn" type="button">+ Add</button></div>
+        <span class="hint">Stock and final working concentration. Molar ↔ mass needs a MW. Untick to leave a row out.</span>
         <div id="extras" class="extras"></div>
       </section>
-    </div>
+    </aside>
 
-    <!-- Output -->
-    <div style="min-width:0">
-      <div class="toolbar">
-        <div class="sum">
-          <span>Make: <b id="sTotal">–</b></span>
-          <span>Base medium: <b id="sImdm">–</b></span>
-          <span>DMSO: <b id="sDmso">–</b></span>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span id="toast" class="toast" role="status"></span>
-          <button id="copyBtn" class="primary" type="button">Copy table</button>
-        </div>
+    <!-- Log -->
+    <section class="log-area panel">
+      <div class="head"><h2>Lab notebook log</h2>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button id="copyAllBtn" type="button">Copy all</button><button id="csvBtn" type="button">Download CSV</button></div></div>
+      <div class="field">
+        <label for="logNote">Note for this batch</label>
+        <textarea id="logNote" rows="2" placeholder="e.g. D0 differentiation, clone 3, HS lot 24B, 6-well ×2"></textarea>
       </div>
-      <div class="tablebox">
-        <table>
-          <thead><tr><th>Component</th><th>Stock</th><th>Final</th><th class="num">Add</th></tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
+        <button id="saveLogBtn" class="primary" type="button">Save batch to log</button>
+        <span class="hint">Saves date, volumes and settings, then clears the ticks. Stored on this device only.</span>
       </div>
-      <ul class="checks">
-        <li><strong>No doxycycline</strong> in differentiation medium.</li>
-        <li>Thaw human serum and Pen/Strep at 37 °C. Keep KP-357 at −80 °C until use.</li>
-        <li>Aspirin is unstable in liquid. Dissolve fresh and add at the start of differentiation.</li>
-        <li><strong>Filter (0.22 µm)</strong> before use.</li>
-        <li>Wash 1–4 × 10⁵ cells 2× with 10 ml PBS to remove doxycycline, then resuspend in this medium.</li>
-      </ul>
-    </div>
+      <div id="logList" class="log-list"></div>
+    </section>
   </div>
 </div>
 
-<textarea id="copyFallback" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:1px;height:1px"></textarea>
+<textarea id="copyFallback" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px;top:0;width:1px;height:1px"></textarea>
 
 <script>
 (function(){
 const $ = id => document.getElementById(id);
-const KEY = "immkcl-diff-medium-v1";
+const KEY = "immkcl-diff-medium-v2", OLDKEY = "immkcl-diff-medium-v1";
 
-/* ---- units ---- */
+/* ---------- units ---------- */
 const UNITS = {
   "M":{d:"molar",f:1}, "mM":{d:"molar",f:1e-3}, "µM":{d:"molar",f:1e-6}, "nM":{d:"molar",f:1e-9},
   "mg/ml":{d:"mass",f:1}, "µg/ml":{d:"mass",f:1e-3}, "ng/ml":{d:"mass",f:1e-6},
@@ -220,180 +210,277 @@ const UNITS = {
   "% (v/v)":{d:"pct",f:1}, "X":{d:"x",f:1}
 };
 const unitOpts = sel => Object.keys(UNITS).map(u=>`<option${u===sel?" selected":""}>${u}</option>`).join("");
-// convert value to base (molar -> M, mass -> mg/ml == g/L)
-function toBase(v,u){return v*UNITS[u].f}
-// returns stock/final ratio in same basis, or null
 function ratio(sv,su,fv,fu,mw){
   const ds=UNITS[su].d, df=UNITS[fu].d;
-  let s=toBase(sv,su), f=toBase(fv,fu);
+  let s=sv*UNITS[su].f, f=fv*UNITS[fu].f;
   if(ds===df) return f/s;
   if(!(mw>0)) return null;
-  // mass (g/L) <-> molar (mol/L): M = (g/L)/MW
-  if(ds==="mass"&&df==="molar"){ s=s/mw; return f/s; }
-  if(ds==="molar"&&df==="mass"){ f=f/mw; return f/s; }
+  if(ds==="mass"&&df==="molar") return f/(s/mw);
+  if(ds==="molar"&&df==="mass") return (f/mw)/s;
   return null;
 }
 
-/* ---- formatting ---- */
+/* ---------- formatting ---------- */
 function fmtVol(ml){
   if(!isFinite(ml)) return "–";
   if(ml>=1) return (Math.round(ml*100)/100).toLocaleString("en-US",{maximumFractionDigits:2})+" ml";
-  const ul=ml*1000;
-  const d = ul>=100?0 : ul>=10?1 : 2;
+  const ul=ml*1000, d= ul>=100?0 : ul>=10?1 : 2;
   return (Math.round(ul*10**d)/10**d).toFixed(d).replace(/(\.\d*?)0+$/,"$1").replace(/\.$/,"")+" µl";
 }
-function fmtN(x,d=2){ if(!isFinite(x)) return "–"; return x.toLocaleString("en-US",{maximumFractionDigits:d}); }
-const num = id => parseFloat($(id).value);
-const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtN=(x,d=2)=>isFinite(x)?x.toLocaleString("en-US",{maximumFractionDigits:d}):"–";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(m){ $("toast").textContent=m; clearTimeout(toast.t); toast.t=setTimeout(()=>$("toast").textContent="",2600); }
 
-/* ---- extras state ---- */
-let extras = [
-  {on:false, example:true, name:"EDTA", sv:0.5, su:"M", fv:2, fu:"mM", mw:""}
-];
+/* ---------- state ---------- */
+const S = { vol:"10", extra:"0", asaW:"0.0180", asaV:"1", clxMg:"80", clxMl:"0.8", clxIU:"100", clxF:"1", clxPre:"auto",
+  extras:[{on:false, example:true, name:"EDTA", sv:0.5, su:"M", fv:2, fu:"mM", mw:""}], checks:{}, log:[], note:"" };
+const FIELDS=["vol","extra","clxMg","clxMl","clxIU","clxF","clxPre"];
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function load(){
+  try{
+    let o=JSON.parse(localStorage.getItem(KEY)||"null");
+    if(!o){ o=JSON.parse(localStorage.getItem(OLDKEY)||"null"); }
+    if(o) for(const k in S) if(o[k]!==undefined) S[k]=o[k];
+  }catch(e){}
+  FIELDS.forEach(id=>$(id).value=S[id]); $("logNote").value=S.note||"";
+}
+const num=k=>parseFloat(S[k]);
 
+/* ---------- compute rows ---------- */
+function compute(){
+  const V=(num("vol")||0)+(num("extra")||0);
+  const R=[]; let added=0, dmso=0;
+  const grp=g=>R.push({group:g});
+  const step=(key,name,note)=>R.push({key,name,note,step:true});
+  const add=o=>{ R.push(o); if(isFinite(o.ml)) added+=o.ml; };
+
+  grp("Before you start");
+  step("thaw","Thaw human serum at 37 °C");
+  step("asa-prep","Weigh aspirin and dissolve fresh in DMSO","Unstable in liquid. Add at the start of differentiation.");
+
+  grp("Base & serum");
+  const baseIdx=R.length;
+  add({key:"serine",name:"L-serine",meta:"1000× → 1× (1/1000)",ml:V/1000,note:"IMDM is serine-free"});
+  add({key:"hs",name:"Human serum",meta:"100% → 5%",ml:V*0.05});
+
+  grp("Anticoagulant / antiplatelet");
+  const cStock=(num("clxMg")/num("clxMl"))*num("clxIU"), cf=num("clxF"), cMl=V*cf/cStock;
+  let preF = S.clxPre==="auto" ? (cMl*1000<2 ? (cMl*1000*10>=2?10:100) : 1) : +S.clxPre;
+  if(preF>1){
+    const dil=cMl*preF, make=Math.max(0.1,Math.ceil(dil*1.2*10)/10), st=make/preF;
+    add({key:"clx",name:"Clexane (1/"+preF+" pre-dilution)",meta:`${fmtN(cStock/preF,0)} U/ml → ${fmtN(cf)} U/ml`,ml:dil,
+      note:`Make ${fmtVol(make)}: ${fmtVol(st)} Clexane + ${fmtVol(make-st)} base medium`});
+  } else {
+    add({key:"clx",name:"Clexane",meta:`${fmtN(cStock,0)} U/ml → ${fmtN(cf)} U/ml`,ml:cMl,
+      warn:cMl*1000<1, note:cMl*1000<1?"Below 1 µl. Consider pre-diluting.":""});
+  }
+  const w=num("asaW"), dv=num("asaV"), af=200;
+  const asaMM=(w/180.158)/(dv/1000)*1000, okA=isFinite(asaMM)&&asaMM>0;
+  const asaMl=V*(af/1000)/asaMM;
+  add({key:"asa",name:"Aspirin",meta: okA?`${fmtN(asaMM,2)} mM in DMSO → 200 µM`:"enter weight → 200 µM",ml:okA?asaMl:NaN,asa:true,warn:!okA});
+  if(okA) dmso+=asaMl;
+
+  grp("Cytokines & small molecules");
+  add({key:"ta",name:"TA-316",meta:"1 µl/ml → 200 ng/ml",ml:V*1e-3});
+  add({key:"scf",name:"SCF",meta:"1 µl/ml → 50 ng/ml",ml:V*1e-3});
+  const g=V*1e-3, gm=Math.max(0.02,Math.ceil(g*1.2*1000/5)*5/1000);
+  add({key:"gnf",name:"GNF-351 (1/20 dilution)",meta:"1 µl/ml → 0.5 µM",ml:g,note:`Make ${fmtVol(gm)}: ${fmtVol(gm/20)} stock + ${fmtVol(gm*19/20)} diluent`});
+  add({key:"ri",name:"Y-27632 (RI)",meta:"2 µl/ml → 10 µM",ml:V*2e-3});
+  add({key:"kp",name:"KP-357",meta:"1.5 µl/ml → 15 µM",ml:V*1.5e-3,note:"Stored at −80 °C"});
+
+  const on=S.extras.map((e,i)=>({e,i})).filter(x=>x.e.on);
+  if(on.length){
+    grp("Additional components");
+    on.forEach(({e,i})=>{
+      const key="x"+i+":"+(e.name||""), nm=e.name||"(unnamed)";
+      const sv=+e.sv, fv=+e.fv, mw=+e.mw;
+      if(e.sv===""||e.fv===""||!(sv>0)||!(fv>=0)){ R.push({key,name:nm,meta:"–",ml:NaN,warn:true,note:"Enter stock and final concentration."}); return; }
+      const meta=`${fmtN(sv,4)} ${e.su} → ${fmtN(fv,4)} ${e.fu}`;
+      const r=ratio(sv,e.su,fv,e.fu,mw);
+      if(r===null){ R.push({key,name:nm,meta,ml:NaN,warn:true,note:"Units can’t be converted. Molar ↔ mass needs a MW."}); return; }
+      const ml=V*r, bad=r>=1, tiny=ml*1000<1;
+      add({key,name:nm,meta,ml,warn:bad||tiny,note:bad?"Final is not below stock. Check the concentrations.":tiny?"Below 1 µl. Consider pre-diluting.":""});
+    });
+  }
+
+  grp("Finish");
+  step("mix","Mix gently");
+  step("filter","Filter through 0.22 µm");
+  step("wash","Wash cells 2× with 10 ml PBS (remove doxycycline), resuspend in this medium");
+
+  const base=V-added;
+  R.splice(baseIdx,0,{key:"base",name:"Base medium",meta:"IMDM + ITS, P/S, MTG, L-AA",ml:base,base:true,warn:base<0,note:base<0?"Additions exceed the final volume.":""});
+  return {V,R,dmso};
+}
+
+/* ---------- render checklist ---------- */
+let sig="", last=null;
+function renderList(){
+  const c=compute(); last=c;
+  const s=c.R.map(r=>r.group?"g:"+r.group:r.key).join("|");
+  const box=$("list");
+  if(s!==sig){
+    sig=s;
+    box.innerHTML=c.R.map(r=>{
+      if(r.group) return `<div class="grp">${esc(r.group)}</div>`;
+      const id="chk-"+r.key.replace(/[^\w-]/g,"_");
+      const cls="item"+(r.step?" step":"")+(r.base?" base":"");
+      const inl = r.asa ? `<div class="inl" data-noclick>
+          <input id="asaW" type="number" inputmode="decimal" min="0" step="0.0001" value="${esc(S.asaW)}" aria-label="Aspirin weight in grams"><span>g in</span>
+          <input id="asaV" type="number" inputmode="decimal" min="0" step="0.1" value="${esc(S.asaV)}" aria-label="DMSO volume in ml"><span>ml DMSO</span></div>` : "";
+      return `<div class="${cls}" data-key="${esc(r.key)}">
+        <input class="chk" type="checkbox" id="${id}" aria-label="${esc(r.name)} done">
+        <div><div class="nm"></div><div class="meta"></div><div class="note"></div></div>
+        <div class="vol"></div>${inl}</div>`;
+    }).join("");
+    ["asaW","asaV"].forEach(k=>{ const el=$(k); if(el) el.addEventListener("input",()=>{ S[k]=el.value; save(); renderList(); }); });
+  }
+  // patch values
+  c.R.forEach(r=>{
+    if(r.group) return;
+    const el=box.querySelector(`.item[data-key="${CSS.escape(r.key)}"]`); if(!el) return;
+    el.querySelector(".nm").innerHTML=esc(r.name)+(r.warn?'<span class="pill">check</span>':"");
+    el.querySelector(".meta").textContent=r.meta||"";
+    el.querySelector(".meta").hidden=!r.meta;
+    el.querySelector(".note").textContent=r.note||"";
+    el.querySelector(".note").hidden=!r.note;
+    el.querySelector(".vol").textContent=r.step?"":fmtVol(r.ml);
+    const on=!!S.checks[r.key];
+    el.querySelector(".chk").checked=on; el.classList.toggle("checked",on);
+  });
+  const items=c.R.filter(r=>!r.group), done=items.filter(r=>S.checks[r.key]).length;
+  $("prog").textContent=`${done} / ${items.length}`;
+  $("prog").classList.toggle("done",done===items.length&&items.length>0);
+  $("sTotal").textContent=fmtVol(c.V);
+  $("sDmso").textContent=c.V>0?fmtN(c.dmso/c.V*100,3)+" % v/v":"–";
+}
+$("list").addEventListener("click",ev=>{
+  if(ev.target.closest("[data-noclick]")) return;
+  const item=ev.target.closest(".item"); if(!item) return;
+  const k=item.dataset.key;
+  if(ev.target.classList.contains("chk")) S.checks[k]=ev.target.checked;
+  else S.checks[k]=!S.checks[k];
+  if(!S.checks[k]) delete S.checks[k];
+  save(); renderList();
+});
+$("resetBtn").addEventListener("click",()=>{ S.checks={}; save(); renderList(); toast("Ticks cleared"); });
+
+/* ---------- extras ---------- */
 function renderExtras(){
   const box=$("extras");
-  if(!extras.length){ box.innerHTML=`<span class="hint">None added. Use “+ Add” for EDTA, extra anticoagulants or inhibitors.</span>`; return; }
-  box.innerHTML = extras.map((e,i)=>`
+  if(!S.extras.length){ box.innerHTML=`<span class="hint">None added. Use “+ Add” for EDTA, extra anticoagulants or inhibitors.</span>`; return; }
+  box.innerHTML=S.extras.map((e,i)=>`
     <div class="extra" data-i="${i}">
       <div class="top">
-        <input id="x-on-${i}" type="checkbox" data-k="on" ${e.on?"checked":""} style="width:auto" aria-label="Include ${esc(e.name)}">
+        <input id="x-on-${i}" type="checkbox" data-k="on" ${e.on?"checked":""} aria-label="Include ${esc(e.name)}">
         <input id="x-name-${i}" type="text" data-k="name" value="${esc(e.name)}" placeholder="Component name" style="font-family:var(--f-ui)">
-        ${e.example?'<span class="pill">Example</span>':''}
+        ${e.example?'<span class="tag">Example</span>':''}
         <button type="button" class="ghost" data-del="${i}" aria-label="Remove row">✕</button>
       </div>
-      <div><div class="lbl">Stock</div>
-        <div class="pair"><input id="x-sv-${i}" type="number" min="0" step="any" data-k="sv" value="${e.sv}"><select id="x-su-${i}" data-k="su">${unitOpts(e.su)}</select></div></div>
-      <div><div class="lbl">Final working</div>
-        <div class="pair"><input id="x-fv-${i}" type="number" min="0" step="any" data-k="fv" value="${e.fv}"><select id="x-fu-${i}" data-k="fu">${unitOpts(e.fu)}</select></div></div>
-      <div><div class="lbl">MW (g/mol, only for molar ↔ mass)</div>
-        <input id="x-mw-${i}" type="number" min="0" step="any" data-k="mw" value="${e.mw}" placeholder="optional"></div>
+      <div><div class="lbl">Stock</div><div class="pair"><input id="x-sv-${i}" type="number" inputmode="decimal" step="any" data-k="sv" value="${e.sv}"><select id="x-su-${i}" data-k="su">${unitOpts(e.su)}</select></div></div>
+      <div><div class="lbl">Final working</div><div class="pair"><input id="x-fv-${i}" type="number" inputmode="decimal" step="any" data-k="fv" value="${e.fv}"><select id="x-fu-${i}" data-k="fu">${unitOpts(e.fu)}</select></div></div>
+      <div><div class="lbl">MW (g/mol, only for molar ↔ mass)</div><input id="x-mw-${i}" type="number" inputmode="decimal" step="any" data-k="mw" value="${e.mw}" placeholder="optional"></div>
     </div>`).join("");
 }
-$("extras").addEventListener("input",ev=>{
+function onExtra(ev){
   const row=ev.target.closest(".extra"); if(!row) return;
   const i=+row.dataset.i, k=ev.target.dataset.k; if(!k) return;
-  const e=extras[i];
+  const e=S.extras[i];
   if(k==="on") e.on=ev.target.checked;
   else if(k==="name"||k==="su"||k==="fu") e[k]=ev.target.value;
   else e[k]=ev.target.value===""?"":parseFloat(ev.target.value);
   if(k!=="on") e.example=false;
-  calc(); save();
-});
-$("extras").addEventListener("change",ev=>{ if(ev.target.tagName==="SELECT"){ev.target.dispatchEvent(new Event("input",{bubbles:true}))} });
+  save(); renderList();
+}
+$("extras").addEventListener("input",onExtra);
+$("extras").addEventListener("change",ev=>{ if(ev.target.tagName==="SELECT") onExtra(ev); });
 $("extras").addEventListener("click",ev=>{
   const d=ev.target.closest("[data-del]"); if(!d) return;
-  extras.splice(+d.dataset.del,1); renderExtras(); calc(); save();
+  S.extras.splice(+d.dataset.del,1); save(); renderExtras(); renderList();
 });
 $("addBtn").addEventListener("click",()=>{
-  extras.push({on:true,example:false,name:"",sv:"",su:"mM",fv:"",fu:"µM",mw:""});
-  renderExtras(); calc(); save();
-  const n=extras.length-1; const el=$("x-name-"+n); if(el) el.focus();
+  S.extras.push({on:true,example:false,name:"",sv:"",su:"mM",fv:"",fu:"µM",mw:""});
+  save(); renderExtras(); renderList();
+  const el=$("x-name-"+(S.extras.length-1)); if(el) el.focus();
 });
 
-/* ---- main calc ---- */
-let lastRows=[];
-function calc(){
-  const V=(num("vol")||0)+(num("extra")||0);
-  const rows=[]; // {group?, name, stock, final, ml, note, flag}
-  let added=0, dmso=0;
-  const add=(o)=>{ rows.push(o); if(isFinite(o.ml)) added+=o.ml; };
-
-  rows.push({group:"Base & serum"});
-  add({name:"L-serine", stock:"1000×", final:"1×  (1/1000)", ml:V/1000, note:"IMDM is serine-free"});
-  add({name:"Human serum", stock:"100%", final:"5%", ml:V*0.05, note:"Thaw at 37 °C"});
-
-  rows.push({group:"Anticoagulant / antiplatelet"});
-  // Clexane
-  const cmg=num("clxMg"), cml=num("clxMl"), ciu=num("clxIU"), cf=num("clxF");
-  const cStock = (cmg/cml)*ciu; // U/ml
-  const cMl = V*cf/cStock;
-  let pre=$("clxPre").value, preF=1;
-  if(pre==="auto"){ preF = cMl*1000<2 ? (cMl*1000*10>=2?10:100) : 1; } else preF=+pre;
-  if(preF>1){
-    const dilMl=cMl*preF;
-    const make=Math.max(0.1, Math.ceil(dilMl*1.2*10)/10); // ml of pre-dilution to prepare, ≥100 µl
-    const stockForMake=make/preF;
-    add({name:"Clexane (enoxaparin)", stock:`${fmtN(cStock,0)} U/ml → 1/${preF} = ${fmtN(cStock/preF,0)} U/ml`, final:`${fmtN(cf)} U/ml`, ml:dilMl,
-      note:`Add pre-diluted stock. Make ${fmtVol(make)}: ${fmtVol(stockForMake)} Clexane + ${fmtVol(make-stockForMake)} base medium. Undiluted would be ${fmtVol(cMl)}.`});
-  } else {
-    add({name:"Clexane (enoxaparin)", stock:`${fmtN(cStock,0)} U/ml (${fmtN(cmg,1)} mg/${fmtN(cml,2)} ml)`, final:`${fmtN(cf)} U/ml`, ml:cMl,
-      flag: cMl*1000<1?"warn":null, note: cMl*1000<1?"Below 1 µl. Consider pre-diluting.":""});
-  }
-  // Aspirin
-  const w=num("asaW"), dv=num("asaV"), af=200; // fixed per protocol
-  const asaStock_mM = (w/180.158)/(dv/1000)*1000;
-  $("asaStock").textContent = isFinite(asaStock_mM)&&asaStock_mM>0 ? fmtN(asaStock_mM,2)+" mM" : "–";
-  const asaMl = V*(af/1000)/asaStock_mM;
-  add({name:"Aspirin (acetylsalicylic acid)", stock: isFinite(asaStock_mM)&&asaStock_mM>0?`${fmtN(asaStock_mM,2)} mM in DMSO`:"enter weight", final:`${fmtN(af)} µM`, ml:asaMl,
-    note: w>0&&dv>0 ? `${fmtN(w,4)} g in ${fmtN(dv,2)} ml DMSO. Add at start of differentiation.` : "Enter weight and DMSO volume."});
-  if(isFinite(asaMl)) dmso+=asaMl;
-
-  rows.push({group:"Cytokines & small molecules"});
-  add({name:"TA-316", stock:"1 µl/ml", final:"200 ng/ml", ml:V*1e-3});
-  add({name:"SCF", stock:"1 µl/ml", final:"50 ng/ml", ml:V*1e-3});
-  const gnfDil=V*1e-3, gnfMake=Math.max(0.02, Math.ceil(gnfDil*1.2*1000/5)*5/1000);
-  add({name:"GNF-351", stock:"1/20 dilution, 1 µl/ml", final:"0.5 µM", ml:gnfDil,
-    note:`Volume is of the 1/20 dilution. Make ${fmtVol(gnfMake)}: ${fmtVol(gnfMake/20)} stock + ${fmtVol(gnfMake*19/20)} diluent.`});
-  add({name:"Y-27632 (RI)", stock:"2 µl/ml", final:"10 µM", ml:V*2e-3});
-  add({name:"KP-357", stock:"1.5 µl/ml", final:"15 µM", ml:V*1.5e-3, note:"Stored at −80 °C"});
-
-  const on=extras.filter(e=>e.on);
-  if(on.length){
-    rows.push({group:"Additional components"});
-    on.forEach(e=>{
-      const sv=+e.sv, fv=+e.fv, mw=+e.mw;
-      const nm=e.name||"(unnamed)";
-      if(!(sv>0)||!(fv>=0)||e.sv===""||e.fv===""){ rows.push({name:nm, stock:"–", final:"–", ml:NaN, note:"Enter stock and final concentration.", flag:"warn"}); return; }
-      const r=ratio(sv,e.su,fv,e.fu,mw);
-      if(r===null){ rows.push({name:nm, stock:`${fmtN(sv,4)} ${e.su}`, final:`${fmtN(fv,4)} ${e.fu}`, ml:NaN, flag:"warn",
-        note: (UNITS[e.su].d==="molar"||UNITS[e.su].d==="mass")&&(UNITS[e.fu].d==="molar"||UNITS[e.fu].d==="mass") ? "Molar ↔ mass units need a MW." : "Stock and final units can’t be converted into each other."}); return; }
-      const ml=V*r;
-      const note = r>=1 ? "Final is not below stock. Check the concentrations." : (ml*1000<1?"Below 1 µl. Consider pre-diluting.":"");
-      add({name:nm, stock:`${fmtN(sv,4)} ${e.su}`, final:`${fmtN(fv,4)} ${e.fu}`, ml, note, flag: note?"warn":null});
-    });
-  }
-
-  const imdm = V-added;
-  rows.splice(1,0,{name:"Base medium", stock:"IMDM + ITS, P/S, MTG, L-AA", final:"to final volume", ml:imdm, flag: imdm<0?"warn":null, note: imdm<0?"Additions exceed the final volume.":"", imdm:true});
-
-  // render
-  const tb=$("tbody");
-  tb.innerHTML = rows.map(r=>{
-    if(r.group) return `<tr class="group"><td colspan="4">${r.group}</td></tr>`;
-    const pill = r.flag==="warn"?'<span class="pill warn">check</span>':"";
-    return `<tr><td>${esc(r.name)}${pill}${r.note?`<span class="note">${esc(r.note)}</span>`:""}</td>
-      <td><span class="n">${esc(r.stock)}</span></td><td><span class="n">${esc(r.final)}</span></td>
-      <td class="vol">${fmtVol(r.ml)}</td></tr>`;
-  }).join("") + `<tr class="total"><td colspan="3">Total</td><td class="vol">${fmtVol(V)}</td></tr>`;
-
-  $("sTotal").textContent=fmtVol(V);
-  $("sImdm").textContent=fmtVol(imdm);
-  $("sDmso").textContent= V>0&&isFinite(dmso) ? fmtN(dmso/V*100,3)+" % v/v" : "–";
-  lastRows=rows;
+/* ---------- copy helpers ---------- */
+function copyText(txt,msg){
+  const fb=()=>{ const t=$("copyFallback"); t.value=txt; t.select(); try{ document.execCommand("copy"); toast(msg); }catch(e){ toast("Copy failed"); } };
+  try{ navigator.clipboard.writeText(txt).then(()=>toast(msg),fb); }catch(e){ fb(); }
 }
-
-/* ---- copy ---- */
+function rowsText(rows){ return rows.map(r=>[r.name,r.meta||"",r.vol].join("\t")).join("\n"); }
+function currentRows(){ return last.R.filter(r=>!r.group&&!r.step).map(r=>({name:r.name,meta:r.meta,vol:fmtVol(r.ml),ul:isFinite(r.ml)?+(r.ml*1000).toFixed(3):""})); }
 $("copyBtn").addEventListener("click",()=>{
-  const V=(num("vol")||0)+(num("extra")||0);
-  const lines=["Component\tStock\tFinal\tAdd"];
-  lastRows.forEach(r=>{ if(r.group) lines.push(r.group.toUpperCase()); else lines.push([r.name,r.stock,r.final,fmtVol(r.ml)].join("\t")); });
-  lines.push(["Total","","",fmtVol(V)].join("\t"));
-  const txt=lines.join("\n");
-  const done=m=>{ $("toast").textContent=m; setTimeout(()=>$("toast").textContent="",2500); };
-  const fallback=()=>{ const t=$("copyFallback"); t.value=txt; t.select(); try{document.execCommand("copy"); done("Copied");}catch(e){done("Select and copy manually");} };
-  try{ navigator.clipboard.writeText(txt).then(()=>done("Copied"),fallback); }catch(e){ fallback(); }
+  copyText("Component\tStock → final\tAdd\n"+rowsText(currentRows())+"\nTotal\t\t"+fmtVol(last.V),"Table copied");
 });
 
-/* ---- persistence (per browser, optional) ---- */
-const IDS=["vol","extra","asaW","asaV","clxMg","clxMl","clxIU","clxF","clxPre"];
-function save(){ try{ const o={extras}; IDS.forEach(id=>o[id]=$(id).value); localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
-function load(){ try{ const o=JSON.parse(localStorage.getItem(KEY)||"null"); if(!o) return;
-  IDS.forEach(id=>{ if(o[id]!==undefined) $(id).value=o[id]; });
-  if(Array.isArray(o.extras)) extras=o.extras; }catch(e){} }
+/* ---------- log ---------- */
+const fmtDate=ts=>{ const d=new Date(ts); const p=n=>String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+function entryText(e){
+  return `${fmtDate(e.ts)} | Differentiation medium (human serum) | ${fmtVol(e.total)}`+
+    (e.extra>0?` (${fmtVol(e.final)} + ${fmtVol(e.extra)} extra)`:"")+
+    (e.note?`\nNote: ${e.note}`:"")+
+    `\nAspirin: ${e.asaW} g in ${e.asaV} ml DMSO (${e.asaMM} mM)`+
+    `\n${rowsText(e.rows)}\n`;
+}
+function renderLog(){
+  const box=$("logList");
+  if(!S.log.length){ box.innerHTML=`<div class="empty">No batches saved yet. Prepare the medium, tick the lines, then tap “Save batch to log”.</div>`; return; }
+  box.innerHTML=S.log.map((e,i)=>`
+    <details class="entry" data-i="${i}">
+      <summary><span class="when">${fmtDate(e.ts)}</span><span class="tot">${fmtVol(e.total)}</span>
+        <span class="en">${e.note?esc(e.note):'<span class="hint">No note</span>'}</span></summary>
+      <div class="body">
+        <table>${e.rows.map(r=>`<tr><td>${esc(r.name)}<div class="hint">${esc(r.meta||"")}</div></td><td>${esc(r.vol)}</td></tr>`).join("")}
+        <tr><td><b>Total</b>${e.extra>0?`<div class="hint">${fmtVol(e.final)} + ${fmtVol(e.extra)} extra</div>`:""}</td><td><b>${fmtVol(e.total)}</b></td></tr></table>
+        <div class="hint" style="margin-top:6px">Aspirin: ${esc(e.asaW)} g in ${esc(e.asaV)} ml DMSO (${esc(e.asaMM)} mM)</div>
+        <div class="acts"><button type="button" data-copy="${i}">Copy entry</button><button type="button" class="ghost" data-del="${i}">Delete</button></div>
+      </div>
+    </details>`).join("");
+}
+$("logNote").addEventListener("input",()=>{ S.note=$("logNote").value; save(); });
+$("saveLogBtn").addEventListener("click",()=>{
+  const w=parseFloat(S.asaW), dv=parseFloat(S.asaV);
+  S.log.unshift({ ts:Date.now(), note:$("logNote").value.trim(), final:num("vol")||0, extra:num("extra")||0, total:last.V,
+    asaW:S.asaW, asaV:S.asaV, asaMM:fmtN((w/180.158)/(dv/1000)*1000,2), rows:currentRows() });
+  S.checks={}; S.note=""; $("logNote").value="";
+  save(); renderLog(); renderList(); toast("Saved to log. Ticks cleared.");
+});
+$("logList").addEventListener("click",ev=>{
+  const c=ev.target.closest("[data-copy]");
+  if(c){ copyText(entryText(S.log[+c.dataset.copy]),"Entry copied"); return; }
+  const d=ev.target.closest("[data-del]");
+  if(d){
+    if(d.dataset.armed){ S.log.splice(+d.dataset.del,1); save(); renderLog(); toast("Entry deleted"); }
+    else { d.dataset.armed="1"; d.textContent="Tap again to delete"; d.classList.add("danger"); setTimeout(()=>{ if(d.isConnected){ delete d.dataset.armed; d.textContent="Delete"; d.classList.remove("danger"); } },3000); }
+  }
+});
+$("copyAllBtn").addEventListener("click",()=>{
+  if(!S.log.length){ toast("Log is empty"); return; }
+  copyText(S.log.map(entryText).join("\n"),"Log copied");
+});
+function csv(){
+  const q=v=>{ v=String(v??""); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
+  const L=[["date","note","final_ml","extra_ml","total_ml","aspirin_g","aspirin_dmso_ml","aspirin_stock_mM","component","stock_to_final","volume","volume_ul"].join(",")];
+  S.log.slice().reverse().forEach(e=>e.rows.forEach(r=>L.push([fmtDate(e.ts),e.note,e.final,e.extra,e.total,e.asaW,e.asaV,e.asaMM,r.name,r.meta,r.vol,r.ul].map(q).join(","))));
+  return L.join("\n");
+}
+$("csvBtn").addEventListener("click",()=>{
+  if(!S.log.length){ toast("Log is empty"); return; }
+  const text=csv();
+  try{
+    const blob=new Blob([text],{type:"text/csv"}), a=document.createElement("a");
+    a.href=URL.createObjectURL(blob); a.download="diff-medium-log.csv"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast("CSV downloaded");
+  }catch(e){ copyText(text,"CSV copied (download blocked)"); }
+});
 
-IDS.forEach(id=>{ $(id).addEventListener("input",()=>{calc();save();}); $(id).addEventListener("change",()=>{calc();save();}); });
-load(); renderExtras(); calc();
+/* ---------- top inputs ---------- */
+FIELDS.forEach(id=>{ const h=()=>{ S[id]=$(id).value; save(); renderList(); }; $(id).addEventListener("input",h); $(id).addEventListener("change",h); });
+
+load(); renderExtras(); renderList(); renderLog();
 })();
 </script>
 
