@@ -311,7 +311,10 @@ function compute(){
 
   grp("Before you start");
   step("thaw","Thaw human serum at 37 °C");
-  step("asa-prep","Weigh aspirin and dissolve fresh in DMSO","Enter the weight in the aspirin line below to get the DMSO volume. Unstable in liquid: add at the start of differentiation.");
+  { const a=asaInfo();
+    R.push({key:"asa-prep",name:"Aspirin stock: dissolve in DMSO",step:true,ml:a.ok?a.dmsoMl:NaN,warn:!a.ok,
+      meta:a.ok?`${fmtN(a.w,4)} g → ${fmtN(a.mM,1)} mM`:"enter weight below",
+      note:"Weigh fresh; enter the weight in the aspirin line. Unstable in liquid: add at the start of differentiation."}); }
 
   grp("Base & serum");
   const baseIdx=R.length;
@@ -340,8 +343,8 @@ function compute(){
   add({key:"scf",name:"SCF",meta:"1 µl/ml → 50 ng/ml",ml:V*1e-3});
   const g=V*1e-3, gm=Math.max(0.02,Math.ceil(g*1.2*1000/5)*5/1000);
   add({key:"gnf",name:"GNF-351 (1/20 dilution)",meta:"1 µl/ml → 0.5 µM",ml:g,note:`Make ${fmtVol(gm)}: ${fmtVol(gm/20)} stock + ${fmtVol(gm*19/20)} diluent`});
-  add({key:"ri",name:"Y-27632 (RI)",meta:"2 µl/ml → 10 µM",ml:V*2e-3});
   add({key:"kp",name:"KP-357",meta:"1.5 µl/ml → 15 µM",ml:V*1.5e-3,note:"Stored at −80 °C"});
+  add({key:"ri",name:"Y-27632 (RI)",meta:"2 µl/ml → 10 µM",ml:V*2e-3});
 
   const on=S.extras.map((e,i)=>({e,i})).filter(x=>x.e.on);
   if(on.length){
@@ -397,7 +400,7 @@ function renderList(){
     el.querySelector(".meta").hidden=!r.meta;
     el.querySelector(".note").textContent=r.note||"";
     el.querySelector(".note").hidden=!r.note;
-    el.querySelector(".vol").textContent=r.step?"":fmtVol(r.ml);
+    el.querySelector(".vol").textContent=(r.ml===undefined)?"":fmtVol(r.ml);
     const on=!!S.checks[r.key];
     el.querySelector(".chk").checked=on; el.classList.toggle("checked",on);
   });
@@ -463,7 +466,7 @@ function copyText(txt,msg){
   try{ navigator.clipboard.writeText(txt).then(()=>toast(msg),fb); }catch(e){ fb(); }
 }
 function rowsText(rows){ return rows.map(r=>[r.name,r.meta||"",r.vol].join("\t")).join("\n"); }
-function currentRows(){ return last.R.filter(r=>!r.group&&!r.step).map(r=>({name:r.name,meta:r.meta,vol:fmtVol(r.ml),ul:isFinite(r.ml)?+(r.ml*1000).toFixed(3):""})); }
+function currentRows(){ return last.R.filter(r=>!r.group&&(!r.step||r.key==="asa-prep")).map(r=>({name:r.name,meta:r.meta,vol:fmtVol(r.ml),ul:isFinite(r.ml)?+(r.ml*1000).toFixed(3):""})); }
 $("copyBtn").addEventListener("click",()=>{
   copyText("Component\tStock → final\tAdd\n"+rowsText(currentRows())+"\nTotal\t\t"+fmtVol(last.V),"Table copied");
 });
@@ -540,14 +543,13 @@ const MMPX=96/25.4;
 function openPrint(e){
   pvEntry=e;
   const byGroup=[]; let g=null;
-  const groupOf=n=>/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
+  const groupOf=n=>/^Aspirin stock/.test(n)?"Before you start":/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
   e.rows.forEach(r=>{ const gg=groupOf(r.name); if(gg!==g){ g=gg; byGroup.push({group:gg}); } byGroup.push(r); });
   const d=fmtDate(e.ts).split(" ")[0];
   $("card").innerHTML=`
     <div class="ch"><b>imMKCL diff. medium · HS</b><span class="mono">${esc(d)}</span></div>
     <div class="info">
       <span>Volume</span><span class="mono"><b>${fmtVol(e.total)}</b>${e.extra>0?` (${fmtVol(e.final)} + ${fmtVol(e.extra)} extra)`:""}</span>
-      <span>Aspirin</span><span class="mono">${esc(e.asaW)} g in ${esc(e.asaV)} DMSO = ${esc(e.asaMM)} mM</span>
       <span>Note</span><span class="${e.note?"":"line"}">${esc(e.note)}</span>
     </div>
     <table>${byGroup.map(r=> r.group ? `<tr class="cg"><td colspan="3">${esc(r.group)}</td></tr>` :
@@ -570,7 +572,7 @@ $("pvPrint").addEventListener("click",()=>{ try{ window.print(); }catch(e){} });
 let pvEntry=null;
 function groupRows(rows){
   const out=[]; let g=null;
-  const groupOf=n=>/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
+  const groupOf=n=>/^Aspirin stock/.test(n)?"Before you start":/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
   rows.forEach(r=>{ const gg=groupOf(r.name); if(gg!==g){ g=gg; out.push({group:gg}); } out.push(r); });
   return out;
 }
@@ -588,7 +590,7 @@ function drawCard(doc,e,k,draw){
   T(fmtDate(e.ts).split(" ")[0],Rt,y+0.4,{font:"courier",size:7.5,align:"right"});
   y+=lh(9.5)+0.8; line(L,y,Rt,y,0.35); y+=1.2;
   const info=[["Volume",fmtVol(e.total)+(e.extra>0?` (${fmtVol(e.final)} + ${fmtVol(e.extra)} extra)`:"")],
-              ["Aspirin",`${e.asaW} g in ${e.asaV} DMSO = ${e.asaMM} mM`],["Note",e.note||""]];
+              ["Note",e.note||""]];
   info.forEach(([a,b])=>{
     T(a,L,y,{size:7,color:90});
     if(a==="Note"&&!b){ line(L+13,y+lh(7)-0.3,Rt,y+lh(7)-0.3,0.2,150); }
