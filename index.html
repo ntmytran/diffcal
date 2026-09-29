@@ -124,6 +124,38 @@ button.danger{color:var(--warn);border-color:var(--warn)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10;font-size:.85rem;font-weight:600;color:var(--panel);background:var(--ok);padding:8px 14px;border-radius:99px;white-space:nowrap}
 .toast:empty{display:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* print preview + cut-out card (card is paper: always black on white) */
+#pv{position:fixed;inset:0;z-index:20;background:rgba(10,12,18,.72);overflow:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.pv-controls{max-width:330px;margin:0 auto 12px;display:flex;flex-direction:column;gap:8px;color:#fff}
+.pv-controls .btns{display:flex;gap:8px}
+.pv-controls .btns button{flex:1}
+.pv-controls p{margin:0;font-size:.8rem;color:#e3e6ee}
+.card{width:86mm;max-width:100%;margin:0 auto;background:#fff;color:#111;border:0.3mm dashed #777;padding:3mm 3.5mm;font-family:var(--f-ui);font-size:7.6pt;line-height:1.25}
+.card .ch{display:flex;justify-content:space-between;gap:2mm;align-items:baseline;border-bottom:0.3mm solid #111;padding-bottom:1.2mm;margin-bottom:1.2mm}
+.card .ch b{font-size:9pt}
+.card .mono{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+.card .info{display:grid;grid-template-columns:auto 1fr;gap:0.6mm 2mm;margin-bottom:1.5mm}
+.card .info span:nth-child(odd){color:#555}
+.card .line{border-bottom:0.2mm solid #999;min-height:3.6mm}
+.card table{width:100%;border-collapse:collapse}
+.card td{padding:0.9mm 0;border-bottom:0.2mm solid #ccc;vertical-align:top}
+.card td.bx{width:4.5mm}
+.card td.bx i{display:inline-block;width:2.6mm;height:2.6mm;border:0.25mm solid #111;margin-top:0.3mm}
+.card td.v{text-align:right;font-family:var(--f-num);font-weight:600;white-space:nowrap;padding-left:2mm;font-size:1.05em}
+.card .sm{color:#555;font-size:.86em;font-family:var(--f-num)}
+.card tr.cg td{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:#555;font-weight:600;border-bottom:0.2mm solid #111;padding-top:1.4mm}
+.card .foot{display:grid;grid-template-columns:1fr 1fr;gap:1mm 3mm;margin-top:1.5mm}
+.card .foot div{display:flex;gap:1.2mm;align-items:center}
+.card .foot i{display:inline-block;width:2.6mm;height:2.6mm;border:0.25mm solid #111;flex:none}
+@page{size:A4 portrait;margin:12mm}
+@media print{
+  html,body{background:#fff!important}
+  :root{padding:0!important}
+  .wrap,.toast,#copyFallback,.pv-controls{display:none!important}
+  #pv{position:static;background:none;padding:0;overflow:visible}
+  .card{margin:0;max-width:none}
+}
 </style>
 
 </head>
@@ -140,7 +172,7 @@ button.danger{color:var(--warn);border-color:var(--warn)}
   <div class="grid">
     <!-- Checklist -->
     <section class="list-area">
-      <div class="head"><h2>Checklist · make <span id="sTotal">–</span></h2><button id="copyBtn" class="ghost" type="button">Copy table</button></div>
+      <div class="head"><h2>Checklist · make <span id="sTotal">–</span></h2><div style="display:flex;gap:4px"><button id="copyBtn" class="ghost" type="button">Copy</button><button id="printBtn" type="button">Print table</button></div></div>
       <div id="list" class="list"></div>
       <p class="nodox"><b>No doxycycline</b> in differentiation medium. DMSO in final medium: <span id="sDmso">–</span>.</p>
     </section>
@@ -195,6 +227,13 @@ button.danger{color:var(--warn);border-color:var(--warn)}
   </div>
 </div>
 
+<div id="pv" hidden>
+  <div class="pv-controls">
+    <div class="btns"><button id="pvPrint" class="primary" type="button">Print</button><button id="pvClose" type="button">Close</button></div>
+    <p>Prints on A4 at the top-left. Print at 100% scale (not “fit to page”), then cut along the dashed line. Card ≤ 88 × 175 mm (½ × 0.7 of B5).</p>
+  </div>
+  <div id="card" class="card"></div>
+</div>
 <textarea id="copyFallback" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px;top:0;width:1px;height:1px"></textarea>
 
 <script>
@@ -232,7 +271,7 @@ const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&g
 function toast(m){ $("toast").textContent=m; clearTimeout(toast.t); toast.t=setTimeout(()=>$("toast").textContent="",2600); }
 
 /* ---------- state ---------- */
-const S = { vol:"10", extra:"0", asaW:"0.0180", asaV:"1", clxMg:"80", clxMl:"0.8", clxIU:"100", clxF:"1", clxPre:"auto",
+const S = { vol:"10", extra:"0", asaW:"0.0180", asaS:"100", clxMg:"80", clxMl:"0.8", clxIU:"100", clxF:"1", clxPre:"auto",
   extras:[{on:false, example:true, name:"EDTA", sv:0.5, su:"M", fv:2, fu:"mM", mw:""}], checks:{}, log:[], note:"" };
 const FIELDS=["vol","extra","clxMg","clxMl","clxIU","clxF","clxPre"];
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
@@ -246,6 +285,12 @@ function load(){
 }
 const num=k=>parseFloat(S[k]);
 
+/* ---------- aspirin stock ---------- */
+function asaInfo(){
+  const w=num("asaW"), mM=num("asaS");
+  const dmsoMl=(w/180.158)/(mM/1000)*1000; // g -> mol -> L -> ml
+  return {w,mM,dmsoMl,ok:w>0&&mM>0&&isFinite(dmsoMl)};
+}
 /* ---------- compute rows ---------- */
 function compute(){
   const V=(num("vol")||0)+(num("extra")||0);
@@ -256,7 +301,7 @@ function compute(){
 
   grp("Before you start");
   step("thaw","Thaw human serum at 37 °C");
-  step("asa-prep","Weigh aspirin and dissolve fresh in DMSO","Unstable in liquid. Add at the start of differentiation.");
+  step("asa-prep","Weigh aspirin and dissolve fresh in DMSO","Enter the weight in the aspirin line below to get the DMSO volume. Unstable in liquid: add at the start of differentiation.");
 
   grp("Base & serum");
   const baseIdx=R.length;
@@ -274,11 +319,11 @@ function compute(){
     add({key:"clx",name:"Clexane",meta:`${fmtN(cStock,0)} U/ml → ${fmtN(cf)} U/ml`,ml:cMl,
       warn:cMl*1000<1, note:cMl*1000<1?"Below 1 µl. Consider pre-diluting.":""});
   }
-  const w=num("asaW"), dv=num("asaV"), af=200;
-  const asaMM=(w/180.158)/(dv/1000)*1000, okA=isFinite(asaMM)&&asaMM>0;
-  const asaMl=V*(af/1000)/asaMM;
-  add({key:"asa",name:"Aspirin",meta: okA?`${fmtN(asaMM,2)} mM in DMSO → 200 µM`:"enter weight → 200 µM",ml:okA?asaMl:NaN,asa:true,warn:!okA});
-  if(okA) dmso+=asaMl;
+  const asa=asaInfo(), af=200, okA=asa.ok;
+  const asaMl=V*(af/1000)/asa.mM;
+  add({key:"asa",name:"Aspirin",meta:`${fmtN(asa.mM,1)} mM in DMSO → 200 µM (1/${fmtN(asa.mM/0.2,0)})`,ml:asa.mM>0?asaMl:NaN,asa:true,warn:!okA,
+    note: okA?`Dissolve ${fmtN(asa.w,4)} g in ${fmtVol(asa.dmsoMl)} DMSO`:"Enter the aspirin weight."});
+  if(asa.mM>0) dmso+=asaMl;
 
   grp("Cytokines & small molecules");
   add({key:"ta",name:"TA-316",meta:"1 µl/ml → 200 ng/ml",ml:V*1e-3});
@@ -326,14 +371,14 @@ function renderList(){
       const id="chk-"+r.key.replace(/[^\w-]/g,"_");
       const cls="item"+(r.step?" step":"")+(r.base?" base":"");
       const inl = r.asa ? `<div class="inl" data-noclick>
-          <input id="asaW" type="number" inputmode="decimal" min="0" step="0.0001" value="${esc(S.asaW)}" aria-label="Aspirin weight in grams"><span>g in</span>
-          <input id="asaV" type="number" inputmode="decimal" min="0" step="0.1" value="${esc(S.asaV)}" aria-label="DMSO volume in ml"><span>ml DMSO</span></div>` : "";
+          <input id="asaW" type="number" inputmode="decimal" min="0" step="0.0001" value="${esc(S.asaW)}" aria-label="Aspirin weight in grams"><span>g to</span>
+          <input id="asaS" type="number" inputmode="decimal" min="0" step="10" value="${esc(S.asaS)}" aria-label="Aspirin stock in mM"><span>mM stock</span></div>` : "";
       return `<div class="${cls}" data-key="${esc(r.key)}">
         <input class="chk" type="checkbox" id="${id}" aria-label="${esc(r.name)} done">
         <div><div class="nm"></div><div class="meta"></div><div class="note"></div></div>
         <div class="vol"></div>${inl}</div>`;
     }).join("");
-    ["asaW","asaV"].forEach(k=>{ const el=$(k); if(el) el.addEventListener("input",()=>{ S[k]=el.value; save(); renderList(); }); });
+    ["asaW","asaS"].forEach(k=>{ const el=$(k); if(el) el.addEventListener("input",()=>{ S[k]=el.value; save(); renderList(); }); });
   }
   // patch values
   c.R.forEach(r=>{
@@ -416,13 +461,18 @@ $("copyBtn").addEventListener("click",()=>{
 });
 
 /* ---------- log ---------- */
+function makeEntry(){
+  const a=asaInfo();
+  return { ts:Date.now(), note:$("logNote").value.trim(), final:num("vol")||0, extra:num("extra")||0, total:last.V,
+    asaW:S.asaW, asaV:a.ok?fmtVol(a.dmsoMl):"–", asaMM:fmtN(a.mM,1), rows:currentRows() };
+}
 const fmtDate=ts=>{ const d=new Date(ts); const p=n=>String(n).padStart(2,"0");
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`; };
 function entryText(e){
   return `${fmtDate(e.ts)} | Differentiation medium (human serum) | ${fmtVol(e.total)}`+
     (e.extra>0?` (${fmtVol(e.final)} + ${fmtVol(e.extra)} extra)`:"")+
     (e.note?`\nNote: ${e.note}`:"")+
-    `\nAspirin: ${e.asaW} g in ${e.asaV} ml DMSO (${e.asaMM} mM)`+
+    `\nAspirin: ${e.asaW} g in ${e.asaV} DMSO (${e.asaMM} mM)`+
     `\n${rowsText(e.rows)}\n`;
 }
 function renderLog(){
@@ -435,20 +485,20 @@ function renderLog(){
       <div class="body">
         <table>${e.rows.map(r=>`<tr><td>${esc(r.name)}<div class="hint">${esc(r.meta||"")}</div></td><td>${esc(r.vol)}</td></tr>`).join("")}
         <tr><td><b>Total</b>${e.extra>0?`<div class="hint">${fmtVol(e.final)} + ${fmtVol(e.extra)} extra</div>`:""}</td><td><b>${fmtVol(e.total)}</b></td></tr></table>
-        <div class="hint" style="margin-top:6px">Aspirin: ${esc(e.asaW)} g in ${esc(e.asaV)} ml DMSO (${esc(e.asaMM)} mM)</div>
-        <div class="acts"><button type="button" data-copy="${i}">Copy entry</button><button type="button" class="ghost" data-del="${i}">Delete</button></div>
+        <div class="hint" style="margin-top:6px">Aspirin: ${esc(e.asaW)} g in ${esc(e.asaV)} DMSO (${esc(e.asaMM)} mM)</div>
+        <div class="acts"><button type="button" data-copy="${i}">Copy entry</button><button type="button" data-print="${i}">Print</button><button type="button" class="ghost" data-del="${i}">Delete</button></div>
       </div>
     </details>`).join("");
 }
 $("logNote").addEventListener("input",()=>{ S.note=$("logNote").value; save(); });
 $("saveLogBtn").addEventListener("click",()=>{
-  const w=parseFloat(S.asaW), dv=parseFloat(S.asaV);
-  S.log.unshift({ ts:Date.now(), note:$("logNote").value.trim(), final:num("vol")||0, extra:num("extra")||0, total:last.V,
-    asaW:S.asaW, asaV:S.asaV, asaMM:fmtN((w/180.158)/(dv/1000)*1000,2), rows:currentRows() });
+  S.log.unshift(makeEntry());
   S.checks={}; S.note=""; $("logNote").value="";
   save(); renderLog(); renderList(); toast("Saved to log. Ticks cleared.");
 });
 $("logList").addEventListener("click",ev=>{
+  const pr=ev.target.closest("[data-print]");
+  if(pr){ openPrint(S.log[+pr.dataset.print]); return; }
   const c=ev.target.closest("[data-copy]");
   if(c){ copyText(entryText(S.log[+c.dataset.copy]),"Entry copied"); return; }
   const d=ev.target.closest("[data-del]");
@@ -463,7 +513,7 @@ $("copyAllBtn").addEventListener("click",()=>{
 });
 function csv(){
   const q=v=>{ v=String(v??""); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; };
-  const L=[["date","note","final_ml","extra_ml","total_ml","aspirin_g","aspirin_dmso_ml","aspirin_stock_mM","component","stock_to_final","volume","volume_ul"].join(",")];
+  const L=[["date","note","final_ml","extra_ml","total_ml","aspirin_g","aspirin_dmso","aspirin_stock_mM","component","stock_to_final","volume","volume_ul"].join(",")];
   S.log.slice().reverse().forEach(e=>e.rows.forEach(r=>L.push([fmtDate(e.ts),e.note,e.final,e.extra,e.total,e.asaW,e.asaV,e.asaMM,r.name,r.meta,r.vol,r.ul].map(q).join(","))));
   return L.join("\n");
 }
@@ -476,6 +526,35 @@ $("csvBtn").addEventListener("click",()=>{
     setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast("CSV downloaded");
   }catch(e){ copyText(text,"CSV copied (download blocked)"); }
 });
+
+/* ---------- print card ---------- */
+const MMPX=96/25.4;
+function openPrint(e){
+  const byGroup=[]; let g=null;
+  const groupOf=n=>/^Base medium|L-serine|Human serum/.test(n)?"Base & serum":/^Clexane|^Aspirin/.test(n)?"Anticoagulant / antiplatelet":/^(TA-316|SCF|GNF-351|Y-27632|KP-357)/.test(n)?"Cytokines & small molecules":"Additional";
+  e.rows.forEach(r=>{ const gg=groupOf(r.name); if(gg!==g){ g=gg; byGroup.push({group:gg}); } byGroup.push(r); });
+  const d=fmtDate(e.ts).split(" ")[0];
+  $("card").innerHTML=`
+    <div class="ch"><b>imMKCL diff. medium · HS</b><span class="mono">${esc(d)}</span></div>
+    <div class="info">
+      <span>Volume</span><span class="mono"><b>${fmtVol(e.total)}</b>${e.extra>0?` (${fmtVol(e.final)} + ${fmtVol(e.extra)} extra)`:""}</span>
+      <span>Aspirin</span><span class="mono">${esc(e.asaW)} g in ${esc(e.asaV)} DMSO = ${esc(e.asaMM)} mM</span>
+      <span>Note</span><span class="${e.note?"":"line"}">${esc(e.note)}</span>
+    </div>
+    <table>${byGroup.map(r=> r.group ? `<tr class="cg"><td colspan="3">${esc(r.group)}</td></tr>` :
+      `<tr><td class="bx"><i></i></td><td>${esc(r.name)}<div class="sm">${esc(r.meta||"")}</div></td><td class="v">${esc(r.vol)}</td></tr>`).join("")}</table>
+    <div class="foot">
+      <div><i></i>No doxycycline</div><div><i></i>Filtered 0.22 µm</div>
+      <div>HS lot <span class="line" style="flex:1"></span></div><div>Initials <span class="line" style="flex:1"></span></div>
+    </div>`;
+  $("pv").hidden=false;
+  // shrink font until the card fits 175 mm height (and the 88 mm width is fixed at 86 mm)
+  const card=$("card"); let fs=7.6; card.style.fontSize=fs+"pt";
+  while(card.offsetHeight>173*MMPX && fs>5.5){ fs-=0.2; card.style.fontSize=fs.toFixed(1)+"pt"; }
+}
+$("printBtn").addEventListener("click",()=>openPrint(Object.assign(makeEntry(),{note:$("logNote").value.trim()})));
+$("pvClose").addEventListener("click",()=>{ $("pv").hidden=true; });
+$("pvPrint").addEventListener("click",()=>{ try{ window.print(); }catch(e){} });
 
 /* ---------- top inputs ---------- */
 FIELDS.forEach(id=>{ const h=()=>{ S[id]=$(id).value; save(); renderList(); }; $(id).addEventListener("input",h); $(id).addEventListener("change",h); });
