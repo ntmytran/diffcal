@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MK Medium">
+<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151c" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>imMKCL Differentiation Medium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: bench-sheet — inputs on the left, the pipetting table as the main surface on the right; stacks on phones */
+:root{
+  --bg:#f5f6f8; --panel:#ffffff; --ink:#1b2130; --muted:#5d6678; --line:#dde1e8;
+  --accent:#9b2c5e; --accent-soft:#f6e6ee; --warn:#9a5b00; --warn-soft:#fdf1dc; --ok:#23704a;
+  --f-ui:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12151c; --panel:#1a1f29; --ink:#e7eaf0; --muted:#98a1b3; --line:#2c3341;
+  --accent:#e57aa8; --accent-soft:#3a2130; --warn:#f0b24d; --warn-soft:#3a2d15; --ok:#6fd0a0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12151c; --panel:#1a1f29; --ink:#e7eaf0; --muted:#98a1b3; --line:#2c3341;
+  --accent:#e57aa8; --accent-soft:#3a2130; --warn:#f0b24d; --warn-soft:#3a2d15; --ok:#6fd0a0; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-size:15px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:20px}
+h1{font-size:1.55rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 10px;font-weight:600}
+.grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.stack{display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:.85rem;font-weight:600}
+.hint{font-size:.78rem;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select{font:inherit;font-family:var(--f-num);font-size:.92rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%;min-width:0}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input.big{font-size:1.35rem;padding:8px 10px}
+.unitbox{display:flex;align-items:center;gap:6px}
+.unitbox span{font-family:var(--f-num);color:var(--muted);font-size:.85rem;white-space:nowrap}
+.divider{border:0;border-top:1px solid var(--line);margin:4px 0}
+button{font:inherit;font-size:.86rem;font-weight:600;border-radius:6px;padding:7px 12px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+button.ghost{border-color:transparent;background:transparent;color:var(--muted);padding:4px 8px}
+button.ghost:hover{color:var(--accent)}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:620px}
+th,td{text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;background:var(--bg)}
+td.num,th.num{text-align:right}
+td .n{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+td.vol{font-family:var(--f-num);font-variant-numeric:tabular-nums;font-weight:500;font-size:1.02rem;text-align:right;white-space:nowrap}
+tr.group td{background:var(--bg);font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:6px 12px}
+tr.total td{border-bottom:0;font-weight:700}
+.note{display:block;font-size:.76rem;color:var(--muted);margin-top:2px}
+.pill{display:inline-block;font-size:.7rem;font-weight:600;padding:1px 7px;border-radius:99px;background:var(--accent-soft);color:var(--accent);margin-left:6px;vertical-align:1px}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.sum{display:flex;flex-wrap:wrap;gap:8px 24px;margin:0 0 12px;font-size:.9rem}
+.sum b{font-family:var(--f-num);font-weight:500}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.extras{display:flex;flex-direction:column;gap:10px}
+.extra{border:1px solid var(--line);border-radius:8px;padding:10px;display:grid;grid-template-columns:1fr;gap:8px;background:var(--bg)}
+.extra .top{display:flex;gap:8px;align-items:center}
+.extra .top input[type=text]{flex:1}
+.extra .pair{display:grid;grid-template-columns:minmax(0,1fr) 92px;gap:6px}
+.extra .lbl{font-size:.74rem;color:var(--muted);font-weight:600}
+.checks{margin:14px 0 0;padding:12px 14px 12px 32px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.88rem;color:var(--muted)}
+.checks li+li{margin-top:4px}
+.checks strong{color:var(--ink)}
+.toast{font-size:.8rem;color:var(--ok);min-height:1em}
+.err{color:var(--warn);font-size:.78rem}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>imMKCL <span>differentiation medium</span> with human serum</h1>
+      <p class="sub">Enter the final volume you need. Every volume below scales to it. Your base medium (500 ml IMDM already supplemented with ITS, Pen/Strep, MTG and L-ascorbic acid) fills the rest. Concentrations follow the protocol (page 1).</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Inputs -->
+    <div class="stack">
+      <section class="panel stack">
+        <h2>Volume</h2>
+        <div class="field">
+          <label for="vol">Final volume of medium</label>
+          <div class="unitbox"><input id="vol" class="big" type="number" min="0" step="0.5" value="10"><span>ml</span></div>
+        </div>
+        <div class="field">
+          <label for="extra">Extra volume</label>
+          <div class="unitbox"><input id="extra" type="number" min="0" step="0.5" value="0"><span>ml</span></div>
+          <span class="hint">The protocol suggests making ≈2 ml extra (lost in the 0.22 µm filter). Leave at 0 if already included above.</span>
+        </div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Aspirin (fresh in DMSO)</h2>
+        <div class="row2">
+          <div class="field">
+            <label for="asaW">Weight</label>
+            <div class="unitbox"><input id="asaW" type="number" min="0" step="0.0001" value="0.0180"><span>g</span></div>
+          </div>
+          <div class="field">
+            <label for="asaV">in DMSO</label>
+            <div class="unitbox"><input id="asaV" type="number" min="0" step="0.1" value="1"><span>ml</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <span style="font-size:.85rem;font-weight:600">Final concentration</span>
+          <div class="n" style="font-family:var(--f-num);font-size:1.05rem">200 µM <span class="hint">(fixed)</span></div>
+          <span class="hint">Acetylsalicylic acid, MW 180.158 g/mol. Stock: <b id="asaStock" class="n">–</b></span>
+        </div>
+      </section>
+
+      <section class="panel stack">
+        <h2>Clexane (enoxaparin)</h2>
+        <div class="row2">
+          <div class="field">
+            <label for="clxMg">Stock</label>
+            <div class="unitbox"><input id="clxMg" type="number" min="0" step="1" value="80"><span>mg /</span></div>
+          </div>
+          <div class="field">
+            <label for="clxMl">&nbsp;</label>
+            <div class="unitbox"><input id="clxMl" type="number" min="0" step="0.1" value="0.8"><span>ml</span></div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="clxIU">Activity</label>
+            <div class="unitbox"><input id="clxIU" type="number" min="0" step="1" value="100"><span>IU/mg</span></div>
+          </div>
+          <div class="field">
+            <label for="clxF">Final</label>
+            <div class="unitbox"><input id="clxF" type="number" min="0" step="0.1" value="1"><span>U/ml</span></div>
+          </div>
+        </div>
+        <span class="hint">Enoxaparin is labelled 100 IU anti-Xa per mg, so 80 mg/0.8 ml = 10,000 U/ml. Change the activity if your vial differs.</span>
+        <div class="field">
+          <label for="clxPre">Pre-dilute stock before adding</label>
+          <select id="clxPre">
+            <option value="auto">Automatically when under 2 µl</option>
+            <option value="1">No, add undiluted stock</option>
+            <option value="10">1/10</option>
+            <option value="100">1/100</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="panel stack">
+        <div class="toolbar" style="margin:0">
+          <h2 style="margin:0">Additional components</h2>
+          <button id="addBtn" type="button">+ Add</button>
+        </div>
+        <span class="hint">Give stock and final working concentration. Mixing molar and mass units needs a MW. Untick a row to leave it out.</span>
+        <div id="extras" class="extras"></div>
+      </section>
+    </div>
+
+    <!-- Output -->
+    <div style="min-width:0">
+      <div class="toolbar">
+        <div class="sum">
+          <span>Make: <b id="sTotal">–</b></span>
+          <span>Base medium: <b id="sImdm">–</b></span>
+          <span>DMSO: <b id="sDmso">–</b></span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span id="toast" class="toast" role="status"></span>
+          <button id="copyBtn" class="primary" type="button">Copy table</button>
+        </div>
+      </div>
+      <div class="tablebox">
+        <table>
+          <thead><tr><th>Component</th><th>Stock</th><th>Final</th><th class="num">Add</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <ul class="checks">
+        <li><strong>No doxycycline</strong> in differentiation medium.</li>
+        <li>Thaw human serum and Pen/Strep at 37 °C. Keep KP-357 at −80 °C until use.</li>
+        <li>Aspirin is unstable in liquid. Dissolve fresh and add at the start of differentiation.</li>
+        <li><strong>Filter (0.22 µm)</strong> before use.</li>
+        <li>Wash 1–4 × 10⁵ cells 2× with 10 ml PBS to remove doxycycline, then resuspend in this medium.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<textarea id="copyFallback" aria-hidden="true" style="position:absolute;left:-9999px;top:0;width:1px;height:1px"></textarea>
+
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+const KEY = "immkcl-diff-medium-v1";
+
+/* ---- units ---- */
+const UNITS = {
+  "M":{d:"molar",f:1}, "mM":{d:"molar",f:1e-3}, "µM":{d:"molar",f:1e-6}, "nM":{d:"molar",f:1e-9},
+  "mg/ml":{d:"mass",f:1}, "µg/ml":{d:"mass",f:1e-3}, "ng/ml":{d:"mass",f:1e-6},
+  "U/ml":{d:"unit",f:1}, "mU/ml":{d:"unit",f:1e-3},
+  "% (v/v)":{d:"pct",f:1}, "X":{d:"x",f:1}
+};
+const unitOpts = sel => Object.keys(UNITS).map(u=>`<option${u===sel?" selected":""}>${u}</option>`).join("");
+// convert value to base (molar -> M, mass -> mg/ml == g/L)
+function toBase(v,u){return v*UNITS[u].f}
+// returns stock/final ratio in same basis, or null
+function ratio(sv,su,fv,fu,mw){
+  const ds=UNITS[su].d, df=UNITS[fu].d;
+  let s=toBase(sv,su), f=toBase(fv,fu);
+  if(ds===df) return f/s;
+  if(!(mw>0)) return null;
+  // mass (g/L) <-> molar (mol/L): M = (g/L)/MW
+  if(ds==="mass"&&df==="molar"){ s=s/mw; return f/s; }
+  if(ds==="molar"&&df==="mass"){ f=f/mw; return f/s; }
+  return null;
+}
+
+/* ---- formatting ---- */
+function fmtVol(ml){
+  if(!isFinite(ml)) return "–";
+  if(ml>=1) return (Math.round(ml*100)/100).toLocaleString("en-US",{maximumFractionDigits:2})+" ml";
+  const ul=ml*1000;
+  const d = ul>=100?0 : ul>=10?1 : 2;
+  return (Math.round(ul*10**d)/10**d).toFixed(d).replace(/(\.\d*?)0+$/,"$1").replace(/\.$/,"")+" µl";
+}
+function fmtN(x,d=2){ if(!isFinite(x)) return "–"; return x.toLocaleString("en-US",{maximumFractionDigits:d}); }
+const num = id => parseFloat($(id).value);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---- extras state ---- */
+let extras = [
+  {on:false, example:true, name:"EDTA", sv:0.5, su:"M", fv:2, fu:"mM", mw:""}
+];
+
+function renderExtras(){
+  const box=$("extras");
+  if(!extras.length){ box.innerHTML=`<span class="hint">None added. Use “+ Add” for EDTA, extra anticoagulants or inhibitors.</span>`; return; }
+  box.innerHTML = extras.map((e,i)=>`
+    <div class="extra" data-i="${i}">
+      <div class="top">
+        <input id="x-on-${i}" type="checkbox" data-k="on" ${e.on?"checked":""} style="width:auto" aria-label="Include ${esc(e.name)}">
+        <input id="x-name-${i}" type="text" data-k="name" value="${esc(e.name)}" placeholder="Component name" style="font-family:var(--f-ui)">
+        ${e.example?'<span class="pill">Example</span>':''}
+        <button type="button" class="ghost" data-del="${i}" aria-label="Remove row">✕</button>
+      </div>
+      <div><div class="lbl">Stock</div>
+        <div class="pair"><input id="x-sv-${i}" type="number" min="0" step="any" data-k="sv" value="${e.sv}"><select id="x-su-${i}" data-k="su">${unitOpts(e.su)}</select></div></div>
+      <div><div class="lbl">Final working</div>
+        <div class="pair"><input id="x-fv-${i}" type="number" min="0" step="any" data-k="fv" value="${e.fv}"><select id="x-fu-${i}" data-k="fu">${unitOpts(e.fu)}</select></div></div>
+      <div><div class="lbl">MW (g/mol, only for molar ↔ mass)</div>
+        <input id="x-mw-${i}" type="number" min="0" step="any" data-k="mw" value="${e.mw}" placeholder="optional"></div>
+    </div>`).join("");
+}
+$("extras").addEventListener("input",ev=>{
+  const row=ev.target.closest(".extra"); if(!row) return;
+  const i=+row.dataset.i, k=ev.target.dataset.k; if(!k) return;
+  const e=extras[i];
+  if(k==="on") e.on=ev.target.checked;
+  else if(k==="name"||k==="su"||k==="fu") e[k]=ev.target.value;
+  else e[k]=ev.target.value===""?"":parseFloat(ev.target.value);
+  if(k!=="on") e.example=false;
+  calc(); save();
+});
+$("extras").addEventListener("change",ev=>{ if(ev.target.tagName==="SELECT"){ev.target.dispatchEvent(new Event("input",{bubbles:true}))} });
+$("extras").addEventListener("click",ev=>{
+  const d=ev.target.closest("[data-del]"); if(!d) return;
+  extras.splice(+d.dataset.del,1); renderExtras(); calc(); save();
+});
+$("addBtn").addEventListener("click",()=>{
+  extras.push({on:true,example:false,name:"",sv:"",su:"mM",fv:"",fu:"µM",mw:""});
+  renderExtras(); calc(); save();
+  const n=extras.length-1; const el=$("x-name-"+n); if(el) el.focus();
+});
+
+/* ---- main calc ---- */
+let lastRows=[];
+function calc(){
+  const V=(num("vol")||0)+(num("extra")||0);
+  const rows=[]; // {group?, name, stock, final, ml, note, flag}
+  let added=0, dmso=0;
+  const add=(o)=>{ rows.push(o); if(isFinite(o.ml)) added+=o.ml; };
+
+  rows.push({group:"Base & serum"});
+  add({name:"L-serine", stock:"1000×", final:"1×  (1/1000)", ml:V/1000, note:"IMDM is serine-free"});
+  add({name:"Human serum", stock:"100%", final:"5%", ml:V*0.05, note:"Thaw at 37 °C"});
+
+  rows.push({group:"Anticoagulant / antiplatelet"});
+  // Clexane
+  const cmg=num("clxMg"), cml=num("clxMl"), ciu=num("clxIU"), cf=num("clxF");
+  const cStock = (cmg/cml)*ciu; // U/ml
+  const cMl = V*cf/cStock;
+  let pre=$("clxPre").value, preF=1;
+  if(pre==="auto"){ preF = cMl*1000<2 ? (cMl*1000*10>=2?10:100) : 1; } else preF=+pre;
+  if(preF>1){
+    const dilMl=cMl*preF;
+    const make=Math.max(0.1, Math.ceil(dilMl*1.2*10)/10); // ml of pre-dilution to prepare, ≥100 µl
+    const stockForMake=make/preF;
+    add({name:"Clexane (enoxaparin)", stock:`${fmtN(cStock,0)} U/ml → 1/${preF} = ${fmtN(cStock/preF,0)} U/ml`, final:`${fmtN(cf)} U/ml`, ml:dilMl,
+      note:`Add pre-diluted stock. Make ${fmtVol(make)}: ${fmtVol(stockForMake)} Clexane + ${fmtVol(make-stockForMake)} base medium. Undiluted would be ${fmtVol(cMl)}.`});
+  } else {
+    add({name:"Clexane (enoxaparin)", stock:`${fmtN(cStock,0)} U/ml (${fmtN(cmg,1)} mg/${fmtN(cml,2)} ml)`, final:`${fmtN(cf)} U/ml`, ml:cMl,
+      flag: cMl*1000<1?"warn":null, note: cMl*1000<1?"Below 1 µl. Consider pre-diluting.":""});
+  }
+  // Aspirin
+  const w=num("asaW"), dv=num("asaV"), af=200; // fixed per protocol
+  const asaStock_mM = (w/180.158)/(dv/1000)*1000;
+  $("asaStock").textContent = isFinite(asaStock_mM)&&asaStock_mM>0 ? fmtN(asaStock_mM,2)+" mM" : "–";
+  const asaMl = V*(af/1000)/asaStock_mM;
+  add({name:"Aspirin (acetylsalicylic acid)", stock: isFinite(asaStock_mM)&&asaStock_mM>0?`${fmtN(asaStock_mM,2)} mM in DMSO`:"enter weight", final:`${fmtN(af)} µM`, ml:asaMl,
+    note: w>0&&dv>0 ? `${fmtN(w,4)} g in ${fmtN(dv,2)} ml DMSO. Add at start of differentiation.` : "Enter weight and DMSO volume."});
+  if(isFinite(asaMl)) dmso+=asaMl;
+
+  rows.push({group:"Cytokines & small molecules"});
+  add({name:"TA-316", stock:"1 µl/ml", final:"200 ng/ml", ml:V*1e-3});
+  add({name:"SCF", stock:"1 µl/ml", final:"50 ng/ml", ml:V*1e-3});
+  const gnfDil=V*1e-3, gnfMake=Math.max(0.02, Math.ceil(gnfDil*1.2*1000/5)*5/1000);
+  add({name:"GNF-351", stock:"1/20 dilution, 1 µl/ml", final:"0.5 µM", ml:gnfDil,
+    note:`Volume is of the 1/20 dilution. Make ${fmtVol(gnfMake)}: ${fmtVol(gnfMake/20)} stock + ${fmtVol(gnfMake*19/20)} diluent.`});
+  add({name:"Y-27632 (RI)", stock:"2 µl/ml", final:"10 µM", ml:V*2e-3});
+  add({name:"KP-357", stock:"1.5 µl/ml", final:"15 µM", ml:V*1.5e-3, note:"Stored at −80 °C"});
+
+  const on=extras.filter(e=>e.on);
+  if(on.length){
+    rows.push({group:"Additional components"});
+    on.forEach(e=>{
+      const sv=+e.sv, fv=+e.fv, mw=+e.mw;
+      const nm=e.name||"(unnamed)";
+      if(!(sv>0)||!(fv>=0)||e.sv===""||e.fv===""){ rows.push({name:nm, stock:"–", final:"–", ml:NaN, note:"Enter stock and final concentration.", flag:"warn"}); return; }
+      const r=ratio(sv,e.su,fv,e.fu,mw);
+      if(r===null){ rows.push({name:nm, stock:`${fmtN(sv,4)} ${e.su}`, final:`${fmtN(fv,4)} ${e.fu}`, ml:NaN, flag:"warn",
+        note: (UNITS[e.su].d==="molar"||UNITS[e.su].d==="mass")&&(UNITS[e.fu].d==="molar"||UNITS[e.fu].d==="mass") ? "Molar ↔ mass units need a MW." : "Stock and final units can’t be converted into each other."}); return; }
+      const ml=V*r;
+      const note = r>=1 ? "Final is not below stock. Check the concentrations." : (ml*1000<1?"Below 1 µl. Consider pre-diluting.":"");
+      add({name:nm, stock:`${fmtN(sv,4)} ${e.su}`, final:`${fmtN(fv,4)} ${e.fu}`, ml, note, flag: note?"warn":null});
+    });
+  }
+
+  const imdm = V-added;
+  rows.splice(1,0,{name:"Base medium", stock:"IMDM + ITS, P/S, MTG, L-AA", final:"to final volume", ml:imdm, flag: imdm<0?"warn":null, note: imdm<0?"Additions exceed the final volume.":"", imdm:true});
+
+  // render
+  const tb=$("tbody");
+  tb.innerHTML = rows.map(r=>{
+    if(r.group) return `<tr class="group"><td colspan="4">${r.group}</td></tr>`;
+    const pill = r.flag==="warn"?'<span class="pill warn">check</span>':"";
+    return `<tr><td>${esc(r.name)}${pill}${r.note?`<span class="note">${esc(r.note)}</span>`:""}</td>
+      <td><span class="n">${esc(r.stock)}</span></td><td><span class="n">${esc(r.final)}</span></td>
+      <td class="vol">${fmtVol(r.ml)}</td></tr>`;
+  }).join("") + `<tr class="total"><td colspan="3">Total</td><td class="vol">${fmtVol(V)}</td></tr>`;
+
+  $("sTotal").textContent=fmtVol(V);
+  $("sImdm").textContent=fmtVol(imdm);
+  $("sDmso").textContent= V>0&&isFinite(dmso) ? fmtN(dmso/V*100,3)+" % v/v" : "–";
+  lastRows=rows;
+}
+
+/* ---- copy ---- */
+$("copyBtn").addEventListener("click",()=>{
+  const V=(num("vol")||0)+(num("extra")||0);
+  const lines=["Component\tStock\tFinal\tAdd"];
+  lastRows.forEach(r=>{ if(r.group) lines.push(r.group.toUpperCase()); else lines.push([r.name,r.stock,r.final,fmtVol(r.ml)].join("\t")); });
+  lines.push(["Total","","",fmtVol(V)].join("\t"));
+  const txt=lines.join("\n");
+  const done=m=>{ $("toast").textContent=m; setTimeout(()=>$("toast").textContent="",2500); };
+  const fallback=()=>{ const t=$("copyFallback"); t.value=txt; t.select(); try{document.execCommand("copy"); done("Copied");}catch(e){done("Select and copy manually");} };
+  try{ navigator.clipboard.writeText(txt).then(()=>done("Copied"),fallback); }catch(e){ fallback(); }
+});
+
+/* ---- persistence (per browser, optional) ---- */
+const IDS=["vol","extra","asaW","asaV","clxMg","clxMl","clxIU","clxF","clxPre"];
+function save(){ try{ const o={extras}; IDS.forEach(id=>o[id]=$(id).value); localStorage.setItem(KEY,JSON.stringify(o)); }catch(e){} }
+function load(){ try{ const o=JSON.parse(localStorage.getItem(KEY)||"null"); if(!o) return;
+  IDS.forEach(id=>{ if(o[id]!==undefined) $(id).value=o[id]; });
+  if(Array.isArray(o.extras)) extras=o.extras; }catch(e){} }
+
+IDS.forEach(id=>{ $(id).addEventListener("input",()=>{calc();save();}); $(id).addEventListener("change",()=>{calc();save();}); });
+load(); renderExtras(); calc();
+})();
+</script>
+
+</body>
+</html>
