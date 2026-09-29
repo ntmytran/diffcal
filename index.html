@@ -225,7 +225,7 @@ button.danger{color:var(--warn);border-color:var(--warn)}
         <div style="display:flex;gap:6px;flex-wrap:wrap"><button id="copyAllBtn" type="button">Copy all</button><button id="csvBtn" type="button">Download CSV</button></div></div>
       <div class="field">
         <label for="logNote">Note for this batch</label>
-        <textarea id="logNote" rows="2" placeholder="e.g. D0 differentiation, clone 3, HS lot 24B, 6-well ×2"></textarea>
+        <textarea id="logNote" rows="2" placeholder="e.g. D0 differentiation, clone 3, 6-well ×2"></textarea>
       </div>
       <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
         <button id="saveLogBtn" class="primary" type="button">Save batch to log</button>
@@ -554,7 +554,7 @@ function openPrint(e){
       `<tr><td class="bx"><i></i></td><td>${esc(r.name)}<div class="sm">${esc(r.meta||"")}</div></td><td class="v">${esc(r.vol)}</td></tr>`).join("")}</table>
     <div class="foot">
       <div class="hl"><i></i>No doxycycline</div><div class="hl"><i></i>Filtered 0.22 µm</div>
-      <div>HS lot <span class="line" style="flex:1"></span></div><div>Initials <span class="line" style="flex:1"></span></div>
+      <div style="grid-column:1 / 3">Initials <span class="line" style="flex:1"></span></div>
     </div>`;
   $("pv").hidden=false;
   // shrink font until the card fits 175 mm height (and the 88 mm width is fixed at 86 mm)
@@ -617,8 +617,7 @@ function drawCard(doc,e,k,draw){
     T(t,x+1.5+bs+1.8,y+(bh-lh(8))/2+0.3,{style:"bold",size:8});
   });
   y+=bh+2.2;
-  T("HS lot",L,y,{size:7,color:90}); line(L+10,y+lh(7)-0.3,L+half,y+lh(7)-0.3,0.2,150);
-  T("Initials",L+half+2,y,{size:7,color:90}); line(L+half+14,y+lh(7)-0.3,Rt,y+lh(7)-0.3,0.2,150);
+  T("Initials",L,y,{size:7,color:90}); line(L+12,y+lh(7)-0.3,Rt,y+lh(7)-0.3,0.2,150);
   y+=lh(7)+P;
   const H=y-Y0;
   if(draw){ doc.setDrawColor(110); doc.setLineWidth(0.25); doc.setLineDashPattern([1.5,1.2],0); doc.rect(X0,Y0,W,H); doc.setLineDashPattern([],0);
